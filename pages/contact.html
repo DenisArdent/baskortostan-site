@@ -1,0 +1,41 @@
+<section class="contact-form">
+    <h1>Связаться с нами</h1>
+    <form id="contactForm">
+        <div class="form-group">
+            <label for="name">Ваше имя:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="topic">Тема обращения:</label>
+            <select id="topic" name="topic" required>
+                <option value="" disabled selected>Выберите тему</option>
+                <option value="question">Вопрос</option>
+                <option value="feedback">Отзыв</option>
+                <option value="cooperation">Сотрудничество</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="message">Сообщение:</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        
+        <button type="submit" class="submit-btn">Отправить</button>
+    </form>
+</section>
+
+<!-- Модальное окно -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Проверьте данные</h2>
+        <div id="modalData"></div>
+        <button id="confirmBtn" class="confirm-btn">Подтвердить отправку</button>
+    </div>
+</div>
