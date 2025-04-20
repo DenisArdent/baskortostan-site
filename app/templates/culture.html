@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="culture-section">
+    <h1>Культура Башкортостана</h1>
+    <p class="culture-description">Башкортостан — это богатая культура, где сочетаются восточные традиции и современность.</p>
+    
+    <div class="culture-block">
+        <h2>Национальные праздники</h2>
+        <ul class="festivals-list">
+            <li class="festival-item">Сабантуй — праздник окончания весенних полевых работ</li>
+            <li class="festival-item">Навруз — день весеннего равноденствия</li>
+            <li class="festival-item">День Республики — 11 октября</li>
+        </ul>
+    </div>
+    
+    {% if figures %}
+    <div class="figures-block">
+        <h2>Известные деятели культуры</h2>
+        <table class="culture-table">
+            <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>Роль</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for figure in figures %}
+                <tr>
+                    <td>{{ figure.name }}</td>
+                    <td>{{ figure.role }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

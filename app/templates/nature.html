@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="nature-section">
+    <h1>Природа Башкортостана</h1>
+    <p class="nature-description">Регион славится живописными горами, лесами, реками и уникальными природными заповедниками.</p>
+    
+    <article class="nature-article">
+        <h2>Гора Ямантау</h2>
+        <img src="{{ url_for('static', filename='img/yamantau.jpg') }}" alt="Гора Ямантау" class="nature-image">
+        <p class="nature-text">Высочайшая точка Южного Урала, окутанная легендами и мифами.</p>
+    </article>
+    
+    <article class="nature-article">
+        <h2>Река Белая</h2>
+        <img src="{{ url_for('static', filename='img/white-river.jpg') }}" alt="Река Белая" class="nature-image">
+        <p class="nature-text">Основная водная артерия Башкортостана, популярное место для туризма и рыбалки.</p>
+    </article>
+</section>
+{% endblock %}

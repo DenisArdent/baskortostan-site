@@ -1,0 +1,15 @@
+<header>
+    <nav class="navbar">
+        <div class="logo">
+            <span>Башкортостан</span>
+            <span id="page-title"> / {{ current_page }}</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}" data-page="home">Главная</a></li>
+            <li><a href="{{ url_for('culture') }}" data-page="culture">Культура</a></li>
+            <li><a href="{{ url_for('nature') }}" data-page="nature">Природа</a></li>
+            <li><a href="{{ url_for('places') }}" data-page="places">Достопримечательности</a></li>
+            <li><a href="{{ url_for('contact') }}" data-page="contact">Связаться с нами</a></li>
+        </ul>
+    </nav>
+</header>
