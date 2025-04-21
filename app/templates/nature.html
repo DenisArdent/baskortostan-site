@@ -12,22 +12,22 @@
     <article class="nature-article">
         <h2>Гора Ямантау</h2>
         <div>
-            <img src="{{ url_for('static', filename='img/yamantau.jpg') }}" alt="Гора Ямантау" class="nature-image">
+            <img src="{{ url_for('static', filename='img/yamantau.jpg') }}" alt="Гора Ямантау" class="nature-image modal-trigger" data-target="modal-yamantau">
         </div>
         <div>
             <p class="nature-text">Высочайшая точка Южного Урала с высотой 1640 м над уровнем моря. Название горы переводится с башкирского как «Злая гора» или «Гора бед». Это место окутано множеством легенд и мифов, связанных с древними верованиями башкир.</p>
-            <a href="#" class="nature-link">Узнать больше о горе Ямантау &rarr;</a>
+            <a href="javascript:void(0)" class="nature-link modal-trigger" data-target="modal-yamantau">Узнать больше о горе Ямантау &rarr;</a>
         </div>
     </article>
-    
+
     <article class="nature-article">
         <h2>Река Белая (Агидель)</h2>
         <div>
-            <img src="{{ url_for('static', filename='img/white-river.jpg') }}" alt="Река Белая" class="nature-image">
+            <img src="{{ url_for('static', filename='img/white-river.jpg') }}" alt="Река Белая" class="nature-image modal-trigger" data-target="modal-river">
         </div>
         <div>
             <p class="nature-text">Основная водная артерия Башкортостана, на башкирском языке называется Агидель. Протяженность реки составляет более 1400 км. Река Белая — популярный маршрут для водного туризма, сплавов и рыбалки.</p>
-            <a href="#" class="nature-link">Узнать больше о реке Белой &rarr;</a>
+            <a href="javascript:void(0)" class="nature-link modal-trigger" data-target="modal-river">Узнать больше о реке Белой  &rarr;</a>
         </div>
     </article>
 </section>
@@ -46,4 +46,75 @@
         <p>Заповедник, созданный для охраны Каповой пещеры с древнейшими наскальными рисунками эпохи палеолита, включенный в список Всемирного наследия ЮНЕСКО.</p>
     </div>
 </section>
+
+<!-- Модальное окно для Ямантау со слайдером -->
+<div id="modal-yamantau" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>Гора Ямантау</h2>
+
+        <!-- Слайдер -->
+        <div class="slider-container">
+            <div class="slider">
+                <div class="slide active">
+                    <img src="{{ url_for('static', filename='img/yamantau1.jpg') }}" alt="Ямантау вид 1">
+                </div>
+                <div class="slide">
+                    <img src="{{ url_for('static', filename='img/yamantau2.jpg') }}" alt="Ямантау вид 2">
+                </div>
+                <div class="slide">
+                    <img src="{{ url_for('static', filename='img/yamantau3.jpg') }}" alt="Ямантау вид 3">
+                </div>
+            </div>
+            <button class="slider-arrow prev">❮</button>
+            <button class="slider-arrow next">❯</button>
+            <div class="slider-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
+        <div class="modal-info">
+            <p><strong>Высота:</strong> 1640 метров</p>
+            <p><strong>Местоположение:</strong> Белорецкий район</p>
+            <p>Высочайшая вершина Южного Урала. Название переводится как "Злая гора". Состоит из кварцитов и кристаллических сланцев.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для реки Белой со слайдером -->
+<div id="modal-river" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>Река Белая (Агидель)</h2>
+
+        <!-- Слайдер -->
+        <div class="slider-container">
+            <div class="slider">
+                <div class="slide active">
+                    <img src="{{ url_for('static', filename='img/white-river1.jpg') }}" alt="Река Белая вид 1">
+                </div>
+                <div class="slide">
+                    <img src="{{ url_for('static', filename='img/white-river2.jpg') }}" alt="Река Белая вид 2">
+                </div>
+            </div>
+            <button class="slider-arrow prev">❮</button>
+            <button class="slider-arrow next">❯</button>
+            <div class="slider-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
+        <div class="modal-info">
+            <p><strong>Длина:</strong> 1430 км</p>
+            <p><strong>Исток:</strong> Уралтау</p>
+            <p>Главная река Башкортостана, левый приток Камы. Название "Агидель" означает "Белая река".</p>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+
 {% endblock %}
