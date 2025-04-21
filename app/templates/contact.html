@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="contact-section">
-    <h1>Обратная связь</h1>
+<section>
+    <h1>Связаться с нами</h1>
+    <p>Если у вас есть вопросы о Башкортостане, идеи для сотрудничества или вы хотите поделиться отзывом, мы будем рады услышать вас. Заполните форму ниже, и мы свяжемся с вами в ближайшее время.</p>
+</section>
 
+<section>
     <div class="ajax-response" id="ajaxResponse">
         <!-- Сюда будет вставляться ответ от сервера -->
     </div>
@@ -11,31 +14,58 @@
     <form id="contactForm" class="contact-form">
         <div class="form-group">
             <label for="name">Ваше имя:</label>
-            <input type="text" id="name" name="name" required>
+            <input type="text" id="name" name="name" placeholder="Введите ваше имя" required>
         </div>
 
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" placeholder="example@mail.ru" required>
         </div>
 
         <div class="form-group">
             <label for="topic">Тема обращения:</label>
             <select id="topic" name="topic" required>
                 <option value="" disabled selected>Выберите тему</option>
-                <option value="question">Вопрос</option>
-                <option value="feedback">Отзыв</option>
-                <option value="cooperation">Сотрудничество</option>
+                <option value="question">Вопрос о регионе</option>
+                <option value="feedback">Отзыв о посещении</option>
+                <option value="cooperation">Предложение о сотрудничестве</option>
+                <option value="other">Другое</option>
             </select>
         </div>
 
         <div class="form-group">
             <label for="message">Сообщение:</label>
-            <textarea id="message" name="message" rows="5" required></textarea>
+            <textarea id="message" name="message" rows="5" placeholder="Введите ваше сообщение здесь..." required></textarea>
         </div>
 
-        <button type="submit" class="submit-btn">Отправить</button>
+        <button type="submit" class="submit-btn">Отправить сообщение</button>
     </form>
+</section>
+
+<section>
+    <h2>Наши контакты</h2>
+    <div class="contact-info">
+        <div class="contact-item">
+            <div class="contact-text">
+                <h3>Адрес</h3>
+                <p>450077, Республика Башкортостан, г. Уфа, ул. Тукаева, 46</p>
+            </div>
+        </div>
+        
+        <div class="contact-item">
+            <div class="contact-text">
+                <h3>Телефон</h3>
+                <p>+7 (347) 123-45-67</p>
+            </div>
+        </div>
+        
+        <div class="contact-item">
+            <div class="contact-text">
+                <h3>Email</h3>
+                <p>info@bashkortostan.ru</p>
+            </div>
+        </div>
+    </div>
 </section>
 {% endblock %}
 

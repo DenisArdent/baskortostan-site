@@ -1,0 +1,426 @@
+/* Enhanced Layout - Улучшенный макет для сайта Башкортостан */
+
+/* Улучшение общей типографики */
+html, body {
+    font-size: 16px; /* Базовый размер шрифта увеличен */
+    line-height: 1.7; /* Увеличенная высота строки для лучшей читаемости */
+}
+
+p {
+    font-size: 1.05rem; /* Увеличиваем размер текста параграфов */
+    margin-bottom: 2rem; /* Унифицированный отступ */
+}
+
+/* Улучшение заголовков */
+h1 {
+    font-size: 2.4rem !important; /* Более крупный главный заголовок */
+    margin-bottom: 2rem !important;
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #333 !important; /* Черный цвет для заголовков */
+}
+
+h2 {
+    font-size: 1.8rem !important; /* Увеличенный подзаголовок */
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+    line-height: 1.3;
+    font-weight: 600;
+    color: #333 !important; /* Черный цвет для заголовков */
+}
+
+h3 {
+    font-size: 1.4rem !important; /* Увеличенный заголовок третьего уровня */
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+    font-weight: 600;
+    color: #333 !important; /* Черный цвет для заголовков */
+}
+
+/* Унифицированные отступы для всех секций и компонентов */
+section {
+    padding: 1.8rem 2rem !important; /* Единое значение внутренних отступов */
+    margin-bottom: 2rem !important; /* Единое значение внешнего отступа снизу */
+    margin-top: 0 !important; /* Убираем верхний отступ у всех секций, чтобы избежать двойных отступов */
+    max-width: 1200px; /* Унифицированная максимальная ширина для всех секций */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Правило для первой секции на странице - у неё должен быть отступ сверху */
+main > section:first-child {
+    margin-top: 2rem !important;
+}
+
+/* Правило для соседних секций - убираем двойной отступ */
+section + section {
+    margin-top: 0 !important;
+}
+
+/* Правило для контейнеров верхнего уровня - они должны использовать только нижний отступ */
+.dual-sections, .traditions-section, .culture-figures, .info-panel, .quote-block {
+    margin-top: 0 !important;
+    margin-bottom: 2rem !important;
+}
+
+/* Специальное правило для section, которая идёт сразу после dual-sections */
+.dual-sections + section {
+    margin-top: 0 !important;
+}
+
+/* Правило для section внутри dual-sections, чтобы они не влияли на внешние отступы */
+.dual-sections section.section-half {
+    margin-bottom: 0 !important;
+}
+
+/* Улучшение содержимого */
+.culture-block, .feature-card {
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem !important; /* Унифицированный отступ */
+    transition: transform 0.2s ease;
+}
+
+.culture-block:hover, .feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Улучшение для карточек на главной странице */
+.feature-card {
+    padding: 1.2rem !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.feature-icon {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+}
+
+.feature-text-content {
+    flex: 1;
+}
+
+.feature-title {
+    margin-top: 0 !important;
+    margin-bottom: 0.5rem !important; /* Уменьшенный отступ между заголовком и текстом */
+    color: #333 !important; /* Черный цвет для заголовков */
+    font-size: 1.2rem !important;
+}
+
+.feature-desc {
+    margin-bottom: 1rem !important; /* Уменьшенный отступ перед ссылкой */
+    color: #555;
+    line-height: 1.5;
+}
+
+.feature-link {
+    display: inline-block;
+    font-weight: 500;
+    text-decoration: none;
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.blue-link {
+    color: var(--blue);
+    border: 1px solid var(--blue);
+}
+
+.green-link {
+    color: var(--green);
+    border: 1px solid var(--green);
+}
+
+.orange-link {
+    color: #d35400;
+    border: 1px solid #d35400;
+}
+
+.blue-link:hover {
+    background-color: var(--blue);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.green-link:hover {
+    background-color: var(--green);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.orange-link:hover {
+    background-color: #d35400;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Улучшение сетки на главной */
+.features-grid {
+    grid-gap: 2rem !important; /* Унифицированный отступ */
+}
+
+/* Улучшение страницы природы */
+.nature-article {
+    margin-bottom: 2rem !important; /* Унифицированный отступ */
+    padding-bottom: 1.5rem !important;
+}
+
+.nature-text {
+    font-size: 1.1rem !important;
+    line-height: 1.6 !important;
+}
+
+/* Улучшение страницы культуры */
+.culture-description, .nature-description {
+    font-size: 1.15rem !important;
+    line-height: 1.7 !important;
+    margin-bottom: 2rem !important; /* Унифицированный отступ */
+    color: #333 !important;
+}
+
+.culture-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0; /* Унифицированный отступ */
+    font-size: 1.05rem;
+}
+
+.culture-table th, .culture-table td {
+    padding: 0.8rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.culture-table th {
+    background-color: var(--blue);
+    color: white;
+    font-weight: 600;
+}
+
+.culture-table tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.culture-table tr:hover {
+    background-color: rgba(0, 87, 184, 0.05);
+}
+
+/* Улучшение страницы достопримечательностей */
+.place-card {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem !important; /* Унифицированный отступ */
+    background: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.place-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.place-card-content {
+    padding: 1.2rem;
+    flex: 1;
+}
+
+.place-card h3 {
+    margin-top: 0 !important;
+    color: var(--blue);
+}
+
+.place-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem !important; /* Унифицированный отступ */
+    margin-top: 2rem !important; /* Унифицированный отступ */
+}
+
+/* Улучшение контактной формы */
+.form-group label {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    font-size: 1.05rem;
+    padding: 0.9rem 1rem;
+}
+
+/* Улучшение для мобильных устройств */
+@media (max-width: 768px) {
+    html, body {
+        font-size: 15px;
+    }
+    
+    h1 {
+        font-size: 2rem !important;
+    }
+    
+    h2 {
+        font-size: 1.6rem !important;
+    }
+    
+    section {
+        padding: 1.5rem !important;
+        margin-bottom: 2rem !important; /* Унифицированный отступ */
+    }
+    
+    .place-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Блок с цитатой о Башкортостане для главной и других страниц */
+.quote-block {
+    background-color: rgba(0, 87, 184, 0.05);
+    border-left: 4px solid var(--blue);
+    padding: 1.5rem;
+    margin: 2rem 0 !important; /* Унифицированный отступ */
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #333;
+    border-radius: 0 8px 8px 0;
+}
+
+.quote-block p {
+    font-style: italic;
+    margin-bottom: 0.7rem;
+}
+
+.quote-block cite {
+    display: block;
+    text-align: right;
+    font-weight: 600;
+    color: var(--blue);
+    font-style: normal;
+}
+
+/* Стилизованные списки для страниц с информацией */
+.styled-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 2rem 0; /* Унифицированный отступ */
+}
+
+.styled-list li {
+    position: relative;
+    padding-left: 1.8rem;
+    margin-bottom: 0.8rem;
+    font-size: 1.05rem;
+}
+
+.styled-list li:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    width: 8px;
+    height: 8px;
+    background-color: var(--green);
+    border-radius: 50%;
+}
+
+/* Информационные панели для интересных фактов */
+.info-panel {
+    background-color: rgba(0, 170, 101, 0.05);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0; /* Унифицированный отступ */
+    border: 1px solid rgba(0, 170, 101, 0.2);
+}
+
+.info-panel h4 {
+    color: var(--green);
+    margin-top: 0;
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+}
+
+.info-panel p {
+    margin-bottom: 0.5rem;
+}
+
+/* Двухколоночный макет для некоторых секций */
+.two-column-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem; /* Унифицированный отступ */
+    margin: 2rem 0; /* Унифицированный отступ */
+}
+
+/* Контейнер для основного контента */
+.content-container {
+    margin: 2rem 0; /* Унифицированный отступ */
+    line-height: 1.6;
+}
+
+/* Горизонтальное расположение секций */
+.dual-sections {
+    display: flex;
+    gap: 2rem; /* Унифицированный отступ */
+    margin-bottom: 2rem; /* Только нижний отступ, убрал margin-top */
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section-half {
+    flex: 1;
+    min-width: 0;
+}
+
+.section-half h2 {
+    margin-top: 0;
+}
+
+/* Раздел с традициями */
+.traditions-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem; /* Только нижний отступ, убрал margin-top */
+}
+
+/* Раздел с деятелями культуры */
+.culture-figures {
+    margin-top: 0; /* Убираем верхний отступ */
+    margin-bottom: 2rem; /* Оставляем только нижний отступ */
+    padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+    .two-column-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .dual-sections {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}

@@ -4,20 +4,208 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} | Башкортостан</title>
+    {% block styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome-animation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/error-messages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-layout.css') }}">
+    {% endblock %}
 </head>
 <body>
     <div class="page-container">
         {% include 'header.html' %}
 
         <main id="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                                <span class="close-flash">&times;</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
             {% block content %}{% endblock %}
         </main>
 
         {% include 'footer.html' %}
     </div>
+    
+    <!-- Модальное окно входа -->
+    <div id="login-modal" class="dark-auth-overlay" style="display: none;">
+        <div class="dark-auth-container">
+            <div class="dark-auth-header">
+                <h1>Вход</h1>
+            </div>
+            
+            <div class="social-login-grid">
+                <a href="#" class="social-btn yandex-btn">
+                    <img src="{{ url_for('static', filename='img/social/yandex.svg') }}" alt="Яндекс" class="social-icon-svg">
+                </a>
+                <a href="#" class="social-btn vk-btn">
+                    <img src="{{ url_for('static', filename='img/social/vk.svg') }}" alt="ВКонтакте" class="social-icon-svg">
+                </a>
+            </div>
+            
+            <div class="dark-auth-divider">
+                <span>С паролем</span>
+            </div>
+            
+            <div class="dark-auth-form">
+                <form id="login-form" action="{{ url_for('login') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="dark-form-group">
+                        <input type="text" name="username" class="dark-form-control" placeholder="Почта" required>
+                    </div>
+                    <div class="dark-form-group">
+                        <input type="password" name="password" class="dark-form-control" placeholder="Пароль" required>
+                    </div>
+                    <div class="dark-form-actions">
+                        <button type="submit" class="dark-btn-primary" disabled>Войти</button>
+                    </div>
+                </form>
+                <div id="login-error" class="error-message" style="display: none; text-align: center; margin-top: 10px;"></div>
+            </div>
+            
+            <div class="dark-auth-links">
+                <a href="#" class="dark-register-link register-button">Зарегистрироваться</a>
+            </div>
+            
+            <div class="dark-auth-close">
+                <a href="#" class="close-modal">&times;</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно регистрации -->
+    <div id="register-modal" class="dark-auth-overlay" style="display: none;">
+        <div class="dark-auth-container">
+            <div class="dark-auth-header">
+                <h1>Регистрация</h1>
+            </div>
+            
+            <div class="social-login-grid">
+                <a href="#" class="social-btn yandex-btn">
+                    <img src="{{ url_for('static', filename='img/social/yandex.svg') }}" alt="Яндекс" class="social-icon-svg">
+                </a>
+                <a href="#" class="social-btn vk-btn">
+                    <img src="{{ url_for('static', filename='img/social/vk.svg') }}" alt="ВКонтакте" class="social-icon-svg">
+                </a>
+            </div>
+            
+            <div class="dark-auth-divider">
+                <span>Или заполните форму</span>
+            </div>
+            
+            <div class="dark-auth-form">
+                <form id="register-form" action="{{ url_for('register') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="dark-form-group">
+                        <input type="text" name="username" class="dark-form-control" placeholder="Имя пользователя" required>
+                    </div>
+                    <div class="dark-form-group">
+                        <input type="email" name="email" class="dark-form-control" placeholder="Почта" required>
+                    </div>
+                    <div class="dark-form-group">
+                        <input type="password" name="password" class="dark-form-control" placeholder="Пароль" required>
+                    </div>
+                    <div class="dark-form-group">
+                        <input type="password" name="password2" class="dark-form-control" placeholder="Повторите пароль" required>
+                    </div>
+                    <div class="dark-form-actions">
+                        <button type="submit" class="dark-btn-primary" disabled>Зарегистрироваться</button>
+                    </div>
+                </form>
+                <div id="register-error" class="error-message" style="display: none; text-align: center; margin-top: 10px;"></div>
+            </div>
+            
+            <div class="dark-auth-links">
+                <a href="#" class="dark-register-link login-button">Уже есть аккаунт? Войти</a>
+            </div>
+            
+            <div class="dark-auth-close">
+                <a href="#" class="close-modal">&times;</a>
+            </div>
+        </div>
+    </div>
 
+    <!-- Встроенный скрипт для модальных окон -->
+    <script>
+        // Функция для показа формы входа
+        function showLoginForm() {
+            console.log('showLoginForm called from inline script');
+            var loginModal = document.getElementById('login-modal');
+            var registerModal = document.getElementById('register-modal');
+            
+            if (registerModal) registerModal.style.display = 'none';
+            if (loginModal) {
+                loginModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+            
+            return false;
+        }
+        
+        // Функция для показа формы регистрации
+        function showRegisterForm() {
+            console.log('showRegisterForm called from inline script');
+            var loginModal = document.getElementById('login-modal');
+            var registerModal = document.getElementById('register-modal');
+            
+            if (loginModal) loginModal.style.display = 'none';
+            if (registerModal) {
+                registerModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+            
+            return false;
+        }
+        
+        // Функция для закрытия модального окна
+        function closeModal(modalId) {
+            var modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Добавление обработчиков при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Обработчики для кнопок закрытия
+            document.querySelectorAll('.close-modal').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var modal = this.closest('.dark-auth-overlay');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+            
+            // Закрытие окна при клике вне формы
+            document.querySelectorAll('.dark-auth-overlay').forEach(function(overlay) {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <!-- Внешние скрипты -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
     {% block scripts %}{% endblock %}
+    <!-- Скрипт для навигации с помощью колёсика мыши -->
+    <script src="{{ url_for('static', filename='js/scroll-navigation.js') }}"></script>
 </body>
 </html>

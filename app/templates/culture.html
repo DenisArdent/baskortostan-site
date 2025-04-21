@@ -1,39 +1,1135 @@
 {% extends "base.html" %}
 
+{% block styles %}
+    {{ super() }}
+    <style>
+        /* Стили для страницы "Культура" */
+        .culture-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .culture-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .culture-header h1:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--blue);
+        }
+
+        .culture-description {
+            font-size: 1.15rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Праздники */
+        .festival-title {
+            text-align: left;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+
+        .festivals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 2rem 0;
+        }
+
+        .festival-box {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .festival-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .festival-image {
+            height: 120px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            border-top: 10px solid transparent; /* Добавляем верхнюю рамку для более стабильного отображения */
+        }
+
+        #sabantuy .festival-image {
+            background: linear-gradient(rgba(0, 87, 184, 0.8), rgba(0, 87, 184, 0.8)), url('https://via.placeholder.com/400x200/2980b9/ffffff?text=Сабантуй');
+            border-top-color: rgba(0, 87, 184, 1); /* Добавляем сплошную полосу сверху */
+        }
+
+        #navruz .festival-image {
+            background: linear-gradient(rgba(0, 170, 101, 0.8), rgba(0, 170, 101, 0.8)), url('https://via.placeholder.com/400x200/27ae60/ffffff?text=Навруз');
+            border-top-color: rgba(0, 170, 101, 1); /* Добавляем сплошную полосу сверху */
+        }
+
+        #republic-day .festival-image {
+            background: linear-gradient(rgba(211, 84, 0, 0.8), rgba(211, 84, 0, 0.8)), url('https://via.placeholder.com/400x200/d35400/ffffff?text=День+Республики');
+            border-top-color: rgba(211, 84, 0, 1); /* Добавляем сплошную полосу сверху */
+        }
+
+        .season-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 30px;
+        }
+
+        .blue {
+            background-color: rgba(0, 87, 184, 0.9);
+        }
+
+        .green {
+            background-color: rgba(0, 170, 101, 0.9);
+        }
+
+        .orange {
+            background-color: rgba(211, 84, 0, 0.9);
+        }
+
+        .festival-info {
+            padding: 1.2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .festival-info h3 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 0.8rem;
+            font-size: 1.3rem;
+        }
+
+        .festival-info p {
+            margin: 0 0 auto 0;
+            line-height: 1.5;
+            color: #555;
+            font-size: 0.95rem;
+            flex-grow: 1;
+            padding-bottom: 1rem;
+            height: 70px; /* Фиксированная высота для всех описаний */
+            overflow: hidden; /* Скрываем текст, который не помещается */
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: auto;
+        }
+
+        .tags span {
+            background-color: #f5f5f5;
+            color: #666;
+            padding: 0.25rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        #sabantuy .tags span:hover {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        #navruz .tags span:hover {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        #republic-day .tags span:hover {
+            background-color: #d35400;
+            color: white;
+        }
+        
+        /* Карточка с фактами */
+        .facts-card {
+            background-color: rgba(0, 170, 101, 0.05);
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(0, 170, 101, 0.2);
+        }
+
+        .facts-card h3 {
+            color: var(--green);
+            margin-top: 0;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Раздел с традициями */
+        .traditions-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .traditions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .tradition-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .tradition-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .tradition-content h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+        }
+
+        .tradition-content p {
+            margin: 0;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        /* Раздел с деятелями культуры */
+        .culture-figures {
+            margin: 3rem 0;
+            padding: 0 1rem;
+        }
+
+        .section-description {
+            max-width: 800px;
+            margin: 0 0 2rem 0;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .figures-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-btn {
+            background: #f5f5f5;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: #444;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .filter-btn:hover {
+            background: #e5e5e5;
+        }
+
+        .filter-btn.active {
+            background: var(--blue);
+            color: white;
+        }
+        
+        /* Цвета для кнопок фильтрации */
+        .politics-btn.active {
+            background: #1A5B9C;
+        }
+        
+        .literature-btn.active {
+            background: rgba(0, 170, 101, 0.9);
+        }
+        
+        .military-btn.active {
+            background: linear-gradient(135deg, #d35400, #e67e22);
+        }
+        
+        .arts-btn.active {
+            background: rgba(211, 84, 0, 0.9);
+        }
+        
+        .filter-btn.active[data-filter="all"] {
+            background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+            color: white;
+        }
+
+        .figures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .figure-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 230px;
+        }
+
+        .figure-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .figure-img {
+            height: 90px;
+            background: linear-gradient(135deg, var(--blue), #3498db);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Цвета для разных сфер деятелей */
+        .politics-color .figure-img {
+            background: linear-gradient(135deg, #1A5B9C, #3A7FBB);
+        }
+        
+        .literature-color .figure-img {
+            background: linear-gradient(135deg, rgba(0, 170, 101, 1), rgba(0, 190, 121, 0.8));
+        }
+        
+        .military-color .figure-img,
+        .filter-btn.military-btn.active {
+            background: linear-gradient(135deg, #d35400, #e67e22);
+        }
+        
+        .arts-color .figure-img,
+        .filter-btn.arts-btn.active {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        }
+
+        .figure-letter {
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+        }
+
+        .figure-info {
+            padding: 1.2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .figure-info h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 1.15rem;
+        }
+
+        .figure-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        
+        /* Стили для кнопки показать еще в зависимости от категории */
+        .show-more-card.politics-theme {
+            background: linear-gradient(135deg, #0057b8, #3498db);
+        }
+        
+        .show-more-card.literature-theme {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+        
+        .show-more-card.military-theme {
+            background: linear-gradient(135deg, #d35400, #e67e22);
+        }
+        
+        .show-more-card.arts-theme {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        }
+        
+        .show-more-card.all-theme {
+            background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+        }
+        
+        /* Стили для карточки "Показать ещё" */
+        .show-more-card {
+            width: 100%;
+            background: linear-gradient(135deg, var(--blue), #3498db);
+            height: 230px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
+        }
+        
+        .show-more-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+        }
+        
+        .plus-icon {
+            font-size: 3.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+        
+        .show-more-card p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        
+        .show-more-card.hide-button .plus-icon {
+            transform: rotate(45deg);
+        }
+        
+        /* Анимация появления карточек */
+        .show-animation {
+            animation: fadeInScale 0.4s ease forwards;
+        }
+        
+        /* Анимация перемещения кнопки */
+        .move-animation {
+            transition: all 0.3s ease;
+            opacity: 0.6;
+            transform: scale(0.95);
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Стили цветов для разных категорий */
+        .politics-color .figure-img,
+        .filter-btn.politics-btn.active {
+            background: linear-gradient(135deg, #0057b8, #3498db);
+        }
+        
+        .literature-color .figure-img,
+        .filter-btn.literature-btn.active {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+        
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .festival-card {
+                flex-direction: column;
+            }
+            
+            .festival-image, .festival-content {
+                width: 100%;
+            }
+            
+            .festival-image {
+                min-height: 150px;
+            }
+            
+            .traditions-grid, .figures-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .culture-header h1 {
+                font-size: 2rem;
+            }
+            
+            .culture-description {
+                font-size: 1.05rem;
+            }
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-<section class="culture-section">
-    <h1>Культура Башкортостана</h1>
-    <p class="culture-description">Башкортостан — это богатая культура, где сочетаются восточные традиции и современность.</p>
-    
-    <div class="culture-block">
-        <h2>Национальные праздники</h2>
-        <ul class="festivals-list">
-            <li class="festival-item">Сабантуй — праздник окончания весенних полевых работ</li>
-            <li class="festival-item">Навруз — день весеннего равноденствия</li>
-            <li class="festival-item">День Республики — 11 октября</li>
+<section>
+    <div class="culture-header">
+        <h1>Культура</h1>
+        <p class="culture-description">Башкортостан — это богатая культура, где сочетаются древние восточные традиции и современные культурные тенденции. Здесь бережно хранится наследие народа, воплощенное в музыке, литературе, искусстве и архитектуре.</p>
+    </div>
+</section>
+
+<section>
+    <h2 class="festival-title">Национальные праздники</h2>
+    <div class="festivals-grid">
+        <div class="festival-box" id="sabantuy">
+            <div class="festival-image">
+                <div class="season-badge blue">Лето</div>
+            </div>
+            <div class="festival-info">
+                <h3>Сабантуй</h3>
+                <p>Традиционный праздник плуга, отмечающий окончание весенних полевых работ.</p>
+                <div class="tags">
+                    <span>Борьба куреш</span>
+                    <span>Скачки</span>
+                    <span>Игры</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="festival-box" id="navruz">
+            <div class="festival-image">
+                <div class="season-badge green">Весна</div>
+            </div>
+            <div class="festival-info">
+                <h3>Навруз</h3>
+                <p>Праздник весеннего равноденствия и наступления нового года по восточному календарю.</p>
+                <div class="tags">
+                    <span>Нац. блюда</span>
+                    <span>Обряды</span>
+                    <span>Гулянья</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="festival-box" id="republic-day">
+            <div class="festival-image">
+                <div class="season-badge orange">Осень</div>
+            </div>
+            <div class="festival-info">
+                <h3>День Республики</h3>
+                <p>Официальный праздник Башкортостана, отмечающий принятие Декларации о государственном суверенитете.</p>
+                <div class="tags">
+                    <span>Мероприятия</span>
+                    <span>Концерты</span>
+                    <span>Парады</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Культурное наследие</h2>
+    <div class="facts-card">
+        <ul class="styled-list">
+            <li>Башкирский народный эпос «Урал-батыр» — один из древнейших эпосов в мире, насчитывающий более 4 тысяч стихотворных строк</li>
+            <li>Курай — традиционный башкирский духовой музыкальный инструмент, изготавливаемый из полого стебля растения</li>
+            <li>Башкирский национальный костюм украшается множеством серебряных монет, которые не только украшали, но и служили оберегом</li>
+            <li>Самобытное искусство башкирского народа — узорное ткачество, вышивка и аппликация — включено в список нематериального культурного наследия ЮНЕСКО</li>
         </ul>
     </div>
-    
-    {% if figures %}
-    <div class="figures-block">
-        <h2>Известные деятели культуры</h2>
-        <table class="culture-table">
-            <thead>
-                <tr>
-                    <th>Имя</th>
-                    <th>Роль</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for figure in figures %}
-                <tr>
-                    <td>{{ figure.name }}</td>
-                    <td>{{ figure.role }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
 </section>
+
+<section class="traditions-section">
+    <h2>Традиции народа</h2>
+    <div class="traditions-grid">
+        <div class="tradition-item">
+            <div class="tradition-icon">M</div>
+            <div class="tradition-content">
+                <h4>Музыкальное искусство</h4>
+                <p>Башкирская народная музыка отличается самобытностью и разнообразием жанров: протяжные песни «узун-кюй», плясовые мелодии «бийу-кюй» и «такмак».</p>
+            </div>
+        </div>
+
+        <div class="tradition-item">
+            <div class="tradition-icon">K</div>
+            <div class="tradition-content">
+                <h4>Кулинарные традиции</h4>
+                <p>Традиционная башкирская кухня богата мясными и кисломолочными блюдами. Знаменитые блюда: бишбармак, баурсак, кумыс и чак-чак.</p>
+            </div>
+        </div>
+
+        <div class="tradition-item">
+            <div class="tradition-icon">H</div>
+            <div class="tradition-content">
+                <h4>Народные ремёсла</h4>
+                <p>Башкиры издавна славились мастерством в изготовлении войлока, ковров, поделок из кожи, дерева и металла. Особенно ценились украшения из серебра.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if figures %}
+<section class="culture-figures">
+    <h2>Известные деятели Башкирии</h2>
+    <p class="section-description">Башкортостан подарил миру множество талантливых деятелей разных сфер — от политики и военного дела до искусства и литературе:</p>
+    
+    <div class="figures-filter">
+        <button class="filter-btn active" data-filter="all">Все</button>
+        <button class="filter-btn politics-btn" data-filter="politics">Политики</button>
+        <button class="filter-btn literature-btn" data-filter="literature">Писатели</button>
+        <button class="filter-btn military-btn" data-filter="military">Военачальники</button>
+        <button class="filter-btn arts-btn" data-filter="arts">Деятели искусства</button>
+    </div>
+    
+    <div class="figures-grid">
+        {% for figure in figures[:2] %}
+        <div class="figure-card">
+            <div class="figure-img">
+                <div class="figure-letter">{{ figure.name[0] }}</div>
+            </div>
+            <div class="figure-info">
+                <h4>{{ figure.name }}</h4>
+                <p>{{ figure.role }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="figure-card show-more-card" id="show-more-card">
+            <div class="plus-icon">+</div>
+            <p>Показать ещё</p>
+        </div>
+        
+        {% for figure in figures[2:] %}
+        <div class="figure-card hidden-card">
+            <div class="figure-img">
+                <div class="figure-letter">{{ figure.name[0] }}</div>
+            </div>
+            <div class="figure-info">
+                <h4>{{ figure.name }}</h4>
+                <p>{{ figure.role }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const figureCards = document.querySelectorAll('.figure-card:not(.show-more-card)');
+        const hiddenCards = document.querySelectorAll('.hidden-card');
+        const showMoreCard = document.getElementById('show-more-card');
+        let allCardsVisible = false;
+        let currentFilter = 'all'; // Переменная для хранения текущего фильтра
+        
+        // Скрыть все скрытые карточки при инициализации
+        hiddenCards.forEach(card => {
+            card.style.display = 'none';
+        });
+        
+        // Показываем только первые две карточки при инициализации
+        const visibleCards = Array.from(figureCards).slice(0, 2);
+        visibleCards.forEach(card => {
+            card.style.display = 'flex';
+        });
+        
+        // Установка кнопки после второй карточки при инициализации
+        if (visibleCards.length >= 2) {
+            const secondCard = visibleCards[1];
+            const figuresGrid = document.querySelector('.figures-grid');
+            if (secondCard && secondCard.nextElementSibling) {
+                figuresGrid.insertBefore(showMoreCard, secondCard.nextElementSibling);
+            }
+        }
+        
+        // Создаем функцию для перемещения кнопки в конец списка
+        function moveButtonToEnd() {
+            const figuresGrid = document.querySelector('.figures-grid');
+            
+            // Добавляем анимацию перемещения
+            showMoreCard.classList.add('move-animation');
+            
+            // С помощью таймаута перемещаем кнопку в абсолютный конец списка
+            setTimeout(() => {
+                // Добавляем кнопку в самый конец списка
+                figuresGrid.appendChild(showMoreCard);
+                
+                // Снимаем анимацию после перемещения
+                setTimeout(() => {
+                    showMoreCard.classList.remove('move-animation');
+                }, 50);
+            }, 300);
+        }
+        
+        // Функция для возврата кнопки на исходную позицию
+        function moveButtonToOriginalPosition() {
+            const figuresGrid = document.querySelector('.figures-grid');
+            
+            // Найдем все видимые карточки (не скрытые)
+            const visibleCards = Array.from(figuresGrid.querySelectorAll('.figure-card:not(.show-more-card)'))
+                .filter(card => card.style.display === 'flex');
+            
+            // Если есть хотя бы две видимые карточки
+            if (visibleCards.length >= 2) {
+                const secondCard = visibleCards[1];
+                
+                // Добавляем анимацию перемещения
+                showMoreCard.classList.add('move-animation');
+                
+                // Вставляем кнопку после второй карточки
+                setTimeout(() => {
+                    // Необходимо использовать insertBefore с nextSibling
+                    if (secondCard && secondCard.nextSibling) {
+                        figuresGrid.insertBefore(showMoreCard, secondCard.nextSibling);
+                    } else {
+                        // Если нет nextSibling, значит вторая карточка последняя, добавляем в конец
+                        figuresGrid.appendChild(showMoreCard);
+                    }
+                    
+                    // Снимаем анимацию после перемещения
+                    setTimeout(() => {
+                        showMoreCard.classList.remove('move-animation');
+                    }, 50);
+                }, 300);
+            }
+        }
+
+        // Обработчик для кнопки "Показать ещё"
+        showMoreCard.addEventListener('click', function() {
+            if (!allCardsVisible) {
+                // Сначала скрываем кнопку
+                showMoreCard.style.opacity = '0';
+                showMoreCard.style.transform = 'scale(0.8)';
+                
+                // Запоминаем this для использования внутри setTimeout
+                const self = this;
+                
+                // Только через 500мс показываем карточки (увеличен таймаут для полного исчезновения кнопки)
+                setTimeout(function() {
+                    // Временно убираем кнопку из DOM, чтобы она не мешала позиционированию карточек
+                    showMoreCard.style.display = 'none';
+                    
+                    // Показываем только скрытые карточки текущей категории
+                    hiddenCards.forEach(card => {
+                        const cardText = card.textContent.toLowerCase();
+                        let isMatch = false;
+                        
+                        // Проверяем, соответствует ли карточка текущей категории
+                        if (currentFilter === 'all') {
+                            isMatch = true;
+                        } else if (currentFilter === 'politics' && (
+                            cardText.includes('политик') || 
+                            cardText.includes('президент') || 
+                            cardText.includes('деятель') ||
+                            cardText.includes('экономист') ||
+                            cardText.includes('государственный') ||
+                            cardText.includes('секретарь')
+                        )) {
+                            isMatch = true;
+                        } else if (currentFilter === 'literature' && (
+                            cardText.includes('писател') || 
+                            cardText.includes('поэт') ||
+                            cardText.includes('литератур')
+                        )) {
+                            isMatch = true;
+                        } else if (currentFilter === 'military' && (
+                            cardText.includes('воевод') || 
+                            cardText.includes('маршал') ||
+                            cardText.includes('герой') ||
+                            cardText.includes('войн') ||
+                            cardText.includes('лётчик')
+                        )) {
+                            isMatch = true;
+                        } else if (currentFilter === 'arts' && (
+                            cardText.includes('артист') || 
+                            cardText.includes('искусств') ||
+                            cardText.includes('композитор') ||
+                            cardText.includes('балет') ||
+                            cardText.includes('певец') ||
+                            cardText.includes('актрис')
+                        )) {
+                            isMatch = true;
+                        }
+                        
+                        // Показываем карточку, только если она соответствует текущему фильтру
+                        if (isMatch) {
+                            card.style.display = 'flex';
+                            card.classList.add('show-animation');
+                        }
+                    });
+                    
+                    // Изменяем текст кнопки
+                    self.querySelector('p').textContent = 'Скрыть';
+                    self.classList.add('hide-button');
+                    allCardsVisible = true;
+                    
+                    // После того как карточки добавлены, перемещаем кнопку в конец списка
+                    moveButtonToEnd();
+                    
+                    // Через короткое время возвращаем кнопку видимой
+                    setTimeout(function() {
+                        showMoreCard.style.display = 'flex';
+                        // Используем RAF чтобы DOM обновился
+                        requestAnimationFrame(function() {
+                            // Второй RAF для надежности
+                            requestAnimationFrame(function() {
+                                showMoreCard.style.opacity = '1';
+                                showMoreCard.style.transform = 'scale(1)';
+                            });
+                        });
+                    }, 200);
+                }, 500);
+            } else {
+                // Сначала скрываем кнопку
+                showMoreCard.style.opacity = '0';
+                showMoreCard.style.transform = 'scale(0.8)';
+                
+                // Запоминаем this для использования внутри setTimeout
+                const self = this;
+                
+                setTimeout(function() {
+                    // Временно убираем кнопку из DOM
+                    showMoreCard.style.display = 'none';
+                    
+                    // Скрываем все карточки сначала
+                    hiddenCards.forEach(card => {
+                        card.style.display = 'none';
+                        card.classList.remove('show-animation');
+                    });
+                    
+                    // Возвращаем исходный текст кнопки
+                    self.querySelector('p').textContent = 'Показать ещё';
+                    self.classList.remove('hide-button');
+                    allCardsVisible = false;
+                    
+                    // Показываем снова первые две карточки соответствующей категории
+                    if (currentFilter === 'all') {
+                        // Для категории "Все" показываем просто первые две карточки
+                        const visibleCards = Array.from(figureCards).slice(0, 2);
+                        visibleCards.forEach(card => {
+                            card.style.display = 'flex';
+                            setCardColor(card);
+                        });
+                    } else {
+                        // Для других категорий находим первые две карточки этой категории
+                        let matchCount = 0;
+                        figureCards.forEach(card => {
+                            const cardText = card.textContent.toLowerCase();
+                            let isMatch = false;
+                            
+                            // Определяем принадлежность к категории
+                            if (currentFilter === 'politics' && (
+                                cardText.includes('политик') || 
+                                cardText.includes('президент') || 
+                                cardText.includes('деятель') ||
+                                cardText.includes('экономист') ||
+                                cardText.includes('государственный') ||
+                                cardText.includes('секретарь')
+                            )) {
+                                isMatch = true;
+                                card.classList.add('politics-color');
+                            } else if (currentFilter === 'literature' && (
+                                cardText.includes('писател') || 
+                                cardText.includes('поэт') ||
+                                cardText.includes('литератур')
+                            )) {
+                                isMatch = true;
+                                card.classList.add('literature-color');
+                            } else if (currentFilter === 'military' && (
+                                cardText.includes('воевод') || 
+                                cardText.includes('маршал') ||
+                                cardText.includes('герой') ||
+                                cardText.includes('войн') ||
+                                cardText.includes('лётчик')
+                            )) {
+                                isMatch = true;
+                                card.classList.add('military-color');
+                            } else if (currentFilter === 'arts' && (
+                                cardText.includes('артист') || 
+                                cardText.includes('искусств') ||
+                                cardText.includes('композитор') ||
+                                cardText.includes('балет') ||
+                                cardText.includes('певец') ||
+                                cardText.includes('актрис')
+                            )) {
+                                isMatch = true;
+                                card.classList.add('arts-color');
+                            }
+                            
+                            // Показываем только первые две совпадающие карточки
+                            if (isMatch && matchCount < 2) {
+                                matchCount++;
+                                card.style.display = 'flex';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                    }
+                    
+                    // Возвращаем кнопку на исходную позицию
+                    moveButtonToOriginalPosition();
+                    
+                    // Прокручиваем к началу раздела
+                    document.querySelector('.culture-figures').scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Через короткое время возвращаем кнопку видимой
+                    setTimeout(function() {
+                        showMoreCard.style.display = 'flex';
+                        // Используем RAF чтобы DOM обновился
+                        requestAnimationFrame(function() {
+                            // Второй RAF для надежности
+                            requestAnimationFrame(function() {
+                                showMoreCard.style.opacity = '1';
+                                showMoreCard.style.transform = 'scale(1)';
+                            });
+                        });
+                    }, 200);
+                }, 500);
+            }
+        });
+        
+        // Функция для определения категории карточки по её тексту
+        function detectCardCategory(cardText) {
+            if (cardText.includes('политик') || 
+                cardText.includes('президент') || 
+                cardText.includes('деятель') ||
+                cardText.includes('экономист') ||
+                cardText.includes('государственный') ||
+                cardText.includes('секретарь')) {
+                return 'politics';
+            } else if (cardText.includes('писател') || 
+                cardText.includes('поэт') ||
+                cardText.includes('литератур')) {
+                return 'literature';
+            } else if (cardText.includes('воевод') || 
+                cardText.includes('маршал') ||
+                cardText.includes('герой') ||
+                cardText.includes('войн') ||
+                cardText.includes('лётчик')) {
+                return 'military';
+            } else if (cardText.includes('артист') || 
+                cardText.includes('искусств') ||
+                cardText.includes('композитор') ||
+                cardText.includes('балет') ||
+                cardText.includes('певец') ||
+                cardText.includes('актрис')) {
+                return 'arts';
+            }
+            return null;
+        }
+        
+        // Функция для определения и установки цвета карточки
+        function setCardColor(card) {
+            const cardText = card.textContent.toLowerCase();
+            const category = detectCardCategory(cardText);
+            
+            // Удаляем все предыдущие цветовые классы
+            card.classList.remove('politics-color', 'literature-color', 'military-color', 'arts-color');
+            
+            // Добавляем соответствующий класс
+            if (category === 'politics') {
+                card.classList.add('politics-color');
+            } else if (category === 'literature') {
+                card.classList.add('literature-color');
+            } else if (category === 'military') {
+                card.classList.add('military-color');
+            } else if (category === 'arts') {
+                card.classList.add('arts-color');
+            }
+        }
+        
+        // Установка цветов карточек при инициализации
+        figureCards.forEach(card => {
+            setCardColor(card);
+        });
+        
+        // Функция для обновления цвета кнопки "Показать ещё"
+        function updateShowMoreCardColor(filter) {
+            // Сначала удаляем все классы цветов
+            showMoreCard.classList.remove('politics-theme', 'literature-theme', 'military-theme', 'arts-theme', 'all-theme');
+            
+            // Добавляем соответствующий класс
+            if (filter === 'politics') {
+                showMoreCard.classList.add('politics-theme');
+            } else if (filter === 'literature') {
+                showMoreCard.classList.add('literature-theme');
+            } else if (filter === 'military') {
+                showMoreCard.classList.add('military-theme');
+            } else if (filter === 'arts') {
+                showMoreCard.classList.add('arts-theme');
+            } else if (filter === 'all') {
+                showMoreCard.classList.add('all-theme');
+            }
+        }
+
+        // Устанавливаем начальный цвет кнопки "Показать ещё" как серый (для категории "Все")
+        updateShowMoreCardColor('all');
+        
+        // Добавляем обработчики событий для кнопок фильтрации
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Снимаем выделение со всех кнопок
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Добавляем выделение на текущую кнопку
+                this.classList.add('active');
+                
+                // Получаем фильтр из атрибута data-filter
+                const filter = this.getAttribute('data-filter');
+                
+                // Запоминаем текущий фильтр
+                currentFilter = filter;
+                
+                // Обновляем цвет кнопки "Показать ещё"
+                updateShowMoreCardColor(filter);
+                
+                // Показываем кнопку "Показать ещё" и устанавливаем её исходное состояние
+                showMoreCard.style.display = 'flex';
+                showMoreCard.querySelector('p').textContent = 'Показать ещё';
+                showMoreCard.classList.remove('hide-button');
+                
+                // Если все карточки сейчас видимы, скрываем их при смене фильтра
+                if (allCardsVisible) {
+                    // Скрываем все дополнительные карточки
+                    hiddenCards.forEach(card => {
+                        card.style.display = 'none';
+                        card.classList.remove('show-animation');
+                    });
+                    
+                    allCardsVisible = false;
+                }
+                
+                // Сбрасываем классы цветовых категорий для всех карточек
+                figureCards.forEach(card => {
+                    card.classList.remove('politics-color', 'literature-color', 'military-color', 'arts-color');
+                });
+                
+                // Если выбрано "Все"
+                if (filter === 'all') {
+                    // Показываем только первые две карточки, скрываем остальные
+                    const visibleCards = Array.from(figureCards).slice(0, 2);
+                    visibleCards.forEach(card => {
+                        card.style.display = 'flex';
+                        // Установка цвета в соответствии с категорией
+                        setCardColor(card);
+                    });
+                    
+                    hiddenCards.forEach(card => {
+                        card.style.display = 'none';
+                        // Устанавливаем цвета и для скрытых карточек, чтобы при нажатии "Показать еще" они имели правильные цвета
+                        setCardColor(card);
+                    });
+                    
+                    // Устанавливаем кнопку после второй карточки
+                    moveButtonToOriginalPosition();
+                    return;
+                }
+                
+                // Фильтруем карточки на основе содержимого
+                let matchCount = 0;
+                let firstMatches = [];
+                
+                figureCards.forEach(card => {
+                    const cardText = card.textContent.toLowerCase();
+                    let isMatch = false;
+                    
+                    // Простая логика фильтрации на основе ключевых слов
+                    if (filter === 'politics' && (
+                        cardText.includes('политик') || 
+                        cardText.includes('президент') || 
+                        cardText.includes('деятель') ||
+                        cardText.includes('экономист') ||
+                        cardText.includes('государственный') ||
+                        cardText.includes('секретарь')
+                    )) {
+                        isMatch = true;
+                        card.classList.add('politics-color');
+                    } else if (filter === 'literature' && (
+                        cardText.includes('писател') || 
+                        cardText.includes('поэт') ||
+                        cardText.includes('литератур')
+                    )) {
+                        isMatch = true;
+                        card.classList.add('literature-color');
+                    } else if (filter === 'military' && (
+                        cardText.includes('воевод') || 
+                        cardText.includes('маршал') ||
+                        cardText.includes('герой') ||
+                        cardText.includes('войн') ||
+                        cardText.includes('лётчик')
+                    )) {
+                        isMatch = true;
+                        card.classList.add('military-color');
+                    } else if (filter === 'arts' && (
+                        cardText.includes('артист') || 
+                        cardText.includes('искусств') ||
+                        cardText.includes('композитор') ||
+                        cardText.includes('балет') ||
+                        cardText.includes('певец') ||
+                        cardText.includes('актрис')
+                    )) {
+                        isMatch = true;
+                        card.classList.add('arts-color');
+                    }
+                    
+                    if (isMatch) {
+                        matchCount++;
+                        if (matchCount <= 2) {
+                            firstMatches.push(card);
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Если найдено меньше двух совпадений, скрываем кнопку "Показать ещё"
+                if (matchCount <= 2) {
+                    showMoreCard.style.display = 'none';
+                } else {
+                    // Устанавливаем кнопку после второй карточки
+                    if (firstMatches.length >= 2) {
+                        const figuresGrid = document.querySelector('.figures-grid');
+                        figuresGrid.insertBefore(showMoreCard, firstMatches[1].nextElementSibling);
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}

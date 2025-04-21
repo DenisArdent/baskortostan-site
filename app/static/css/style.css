@@ -7,13 +7,15 @@
 }
 
 /* ===== Основные стили ===== */
-body {
+html, body {
     font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
     background-color: var(--cream);
     color: #333;
     line-height: 1.6;
+    overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+    width: 100%;
 }
 
 .page-container {
@@ -22,62 +24,133 @@ body {
     min-height: 100vh;
 }
 
-/* ===== Шапка (синяя) ===== */
+/* ===== Шапка ===== */
 header {
     width: 100%;
-    background: var(--blue);
     color: var(--white);
-    padding: 1rem 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    position: relative;
+    left: 0;
+    right: 0;
+    overflow: hidden;
 }
 
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Общий контейнер для содержимого */
+.container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Контейнер с центрированным логотипом */
+.center-logo {
+    justify-content: center;
+}
+
+/* Верхняя панель с логотипом и авторизацией */
+.top-header {
+    background: var(--blue);
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
-    display: flex;
-    align-items: center;
+    letter-spacing: 0.5px;
 }
 
-#page-title {
-    margin-left: 0.5rem;
+.logo-link {
+    color: var(--white);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.logo-link:hover {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Основная навигационная панель */
+.main-nav {
+    background: var(--blue);
+    padding: 0.4rem 0;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.main-nav .container {
+    position: relative;
+    max-width: 100%;
+    padding-right: 0;
+}
+
+.current-page-display {
+    font-size: 1.1rem;
     opacity: 0.9;
-    font-weight: normal;
+    display: none; /* Скрыто на больших экранах, будет видно на мобильных */
 }
 
-/* ===== Навигация ===== */
 .nav-links {
     display: flex;
-    gap: 1.5rem;
     list-style: none;
     margin: 0;
     padding: 0;
+    flex: 1;
+    justify-content: center;
+    gap: 1.5rem;
+    max-width: 800px; /* Ограничиваем максимальную ширину меню */
+    margin: 0 auto; /* Центрирование */
+}
+
+.nav-links li {
+    position: relative;
 }
 
 .nav-links a {
     color: var(--white);
     text-decoration: none;
     padding: 0.5rem 1rem;
-    border-radius: 4px;
-    transition: all 0.3s ease;
+    border-radius: 3px;
+    transition: all 0.25s ease;
+    display: block;
+    font-weight: 500;
 }
 
 .nav-links a:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
 .nav-links a.active {
     background-color: var(--white);
     color: var(--blue);
     font-weight: bold;
+}
+
+/* Кнопка мобильного меню */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    cursor: pointer;
+}
+
+.menu-toggle span {
+    height: 3px;
+    width: 100%;
+    background-color: var(--white);
+    border-radius: 2px;
+    transition: all 0.3s ease;
 }
 
 /* ===== Основной контент ===== */
@@ -93,6 +166,73 @@ main {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Общие стили секций ===== */
+section {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem 2rem 2rem 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Стили для сетки функций на главной странице */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 0;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.feature-title {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    color: var(--blue);
+}
+
+.feature-desc {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.5;
+}
+
+section h1 {
+    color: var(--blue);
+    font-size: 2rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+section h2 {
+    color: #333;
+    font-size: 1.4rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+section p {
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
 }
 
 /* ===== Футер (зеленый) ===== */
@@ -200,6 +340,862 @@ footer p {
     margin: 2rem auto;
     border-radius: 8px;
     overflow: hidden;
+}
+
+/* ===== Стили для элементов авторизации ===== */
+/* Стили для блока правого меню */
+.right-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+    padding-right: 30px; /* Увеличенный отступ справа */
+    position: absolute; /* Абсолютное позиционирование */
+    right: 0; /* Прижимаем к правой стороне */
+    top: 50%; /* Центрирование по вертикали */
+    transform: translateY(-50%); /* Точное центрирование по вертикали */
+}
+
+.nav-auth {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.auth-link {
+    color: var(--white);
+    text-decoration: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 3px;
+    transition: all 0.25s ease;
+    font-size: 0.9rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.auth-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.user-greeting {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Адаптивные стили для мобильных устройств */
+@media (max-width: 768px) {
+    .container {
+        flex-wrap: wrap;
+    }
+    
+    .top-header .container {
+        justify-content: center;
+    }
+    
+    .main-nav .container {
+        padding: 0.5rem 1rem;
+        position: relative;
+    }
+    
+    .current-page-display {
+        display: block;
+        font-size: 1rem;
+        margin-right: auto;
+    }
+    
+    .menu-toggle {
+        display: flex;
+    }
+    
+    .right-menu {
+        position: relative;
+        transform: none;
+        top: auto;
+        padding-right: 10px;
+    }
+    
+    .nav-links {
+        position: absolute;
+        flex-direction: column;
+        background: var(--blue);
+        top: 100%;
+        left: 0;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        max-width: 100%;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+        z-index: 100;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-links.active {
+        max-height: 400px;
+    }
+    
+    .nav-links li {
+        width: 100%;
+    }
+    
+    .nav-links a {
+        padding: 1rem;
+        border-radius: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+@media (max-width: 576px) {
+    .user-greeting {
+        display: none;
+    }
+}
+
+/* Стили для форм авторизации и регистрации */
+.auth-container {
+    max-width: 450px;
+    margin: 2rem auto;
+    padding: 1.8rem;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    border: 1px solid #e0e0e0;
+}
+
+.auth-container h1 {
+    margin-top: 0;
+    color: #333;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.6rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.auth-form {
+    margin-bottom: 1.5rem;
+}
+
+.auth-form .form-group {
+    margin-bottom: 1.2rem;
+}
+
+.auth-form label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #444;
+}
+
+.auth-form .form-control {
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.auth-form .form-control:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(0, 87, 184, 0.1);
+}
+
+.auth-form .error-message {
+    color: #d32f2f;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    display: block;
+    font-weight: 400;
+}
+
+.auth-form .remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.8rem 0 1.2rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.auth-form .btn-primary {
+    background-color: var(--blue);
+    color: white;
+    padding: 0.7rem 0;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    width: 100%;
+    transition: all 0.2s ease;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.auth-form .btn-primary:hover {
+    background-color: #0044a0;
+}
+
+.auth-links {
+    text-align: center;
+    margin-top: 1.5rem;
+    border-top: 1px solid #eee;
+    padding-top: 1.2rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.auth-links a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-links a:hover {
+    color: #0044a0;
+}
+
+/* ===== Стили для темной формы авторизации ===== */
+.dark-auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.dark-auth-container {
+    width: 400px;
+    max-width: 90%;
+    position: relative;
+    color: #fff;
+}
+
+.dark-auth-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dark-auth-header h1 {
+    font-size: 28px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.dark-auth-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0;
+}
+
+.social-login-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 45px;
+    border-radius: 4px;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: bold;
+}
+
+.yandex-btn {
+    background-color: #FC3F1D;
+}
+
+.vk-btn {
+    background-color: #0077FF;
+}
+
+.social-icon {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.social-icon-svg {
+    height: 20px;
+    width: auto;
+    fill: currentColor;
+    display: block;
+    margin: 0 auto;
+}
+
+.dark-auth-divider {
+    position: relative;
+    text-align: center;
+    margin: 25px 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dark-auth-divider span {
+    padding: 0 15px;
+    background-color: transparent;
+    position: relative;
+    z-index: 2;
+}
+
+.dark-auth-divider:before,
+.dark-auth-divider:after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.2);
+    z-index: 1;
+    margin: 0 15px;
+}
+
+/* Селекторы для отдельного позиционирования линий больше не нужны благодаря flexbox */
+
+.dark-form-group {
+    margin-bottom: 15px;
+}
+
+.dark-form-control {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 12px 15px;
+    font-size: 14px;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.dark-form-control:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.dark-form-group.remember-me {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 20px 0;
+}
+
+.dark-form-group.remember-me input[type="checkbox"] {
+    margin-top: 2px;
+}
+
+.dark-btn-primary {
+    width: 100%;
+    background-color: var(--blue);
+    color: white;
+    border: none;
+    padding: 12px 0;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dark-btn-primary:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.dark-btn-primary:hover:not(:disabled) {
+    background-color: #0044a0;
+}
+
+.dark-auth-links {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.dark-register-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+}
+
+.dark-register-link:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.dark-auth-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    font-size: 28px;
+}
+
+.dark-auth-close a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+}
+
+.dark-auth-close a:hover {
+    color: #fff;
+}
+
+/* ===== Стили для страницы Культура ===== */
+.culture-description {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 800px;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+}
+
+.culture-block {
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    border-left: 4px solid var(--blue);
+}
+
+.festivals-list {
+    padding-left: 1.2rem;
+}
+
+.festival-item {
+    margin-bottom: 0.8rem;
+    position: relative;
+    padding-left: 0.5rem;
+}
+
+.culture-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.culture-table th {
+    background-color: var(--blue);
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 500;
+}
+
+.culture-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.culture-table tr:last-child td {
+    border-bottom: none;
+}
+
+.culture-table tr:hover td {
+    background-color: #f5f9ff;
+}
+
+/* ===== Стили для страницы Природа ===== */
+.nature-description {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 800px;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+}
+
+.nature-article {
+    margin-bottom: 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nature-article:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.nature-article h2 {
+    grid-column: 1 / -1;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--blue);
+}
+
+.nature-image {
+    width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+    height: 260px;
+}
+
+.nature-text {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #444;
+    margin: 0;
+}
+
+/* В мобильной версии становится одна колонка */
+@media (max-width: 768px) {
+    .nature-article {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== Стили для страницы Достопримечательности ===== */
+.accordion-item {
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.3s ease;
+}
+
+.accordion-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.accordion-header {
+    background-color: #f9f9f9;
+    padding: 15px 20px;
+    margin: 0;
+    cursor: pointer;
+    color: var(--blue);
+    font-weight: 500;
+    position: relative;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.accordion-header:after {
+    content: '+';
+    position: absolute;
+    right: 20px;
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.accordion-header.active {
+    background-color: var(--blue);
+    color: white;
+}
+
+.accordion-header.active:after {
+    content: '\2212'; /* minus sign */
+    transform: rotate(180deg);
+    color: white;
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding: 0 20px;
+}
+
+.accordion-content.show {
+    max-height: 500px;
+    padding: 20px;
+}
+
+.accordion-content p {
+    margin: 0;
+    line-height: 1.7;
+}
+
+/* ===== Стили для формы Обратной связи ===== */
+.contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(0, 87, 184, 0.1);
+}
+
+.submit-btn {
+    background-color: var(--blue);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.submit-btn:hover {
+    background-color: #0044a0;
+    transform: translateY(-2px);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.ajax-response {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    display: none;
+}
+
+.ajax-response.success {
+    background-color: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    color: #2e7d32;
+}
+
+.ajax-response.error {
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    color: #c62828;
+}
+
+/* ===== Стили для страницы Главная ===== */
+.intro {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.intro h1 {
+    font-size: 2.5rem;
+    color: var(--blue);
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.5rem;
+}
+
+.intro h1:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 25%;
+    right: 25%;
+    height: 3px;
+    background-color: var(--green);
+}
+
+.intro p {
+    font-size: 1.2rem;
+    color: #555;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.feature-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: var(--blue);
+    margin-bottom: 1rem;
+}
+
+.feature-title {
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.feature-desc {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ===== Стили для блока контактов ===== */
+.contact-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.contact-icon {
+    font-size: 2rem;
+    color: var(--blue);
+}
+
+.contact-text h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.contact-text p {
+    margin: 0;
+    color: #555;
+    line-height: 1.5;
+}
+
+.nature-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nature-link:hover {
+    color: var(--green);
+    text-decoration: underline;
+}
+
+/* ===== Стили для flash-сообщений ===== */
+.flash-messages {
+    max-width: 800px;
+    margin: 1rem auto;
+    padding: 0 1rem;
+}
+
+.flash-message {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    position: relative;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.flash-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.flash-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.flash-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.flash-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.close-flash {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    font-size: 1.2rem;
 }
 
 .accordion-item {

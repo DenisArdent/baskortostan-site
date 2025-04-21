@@ -1,27 +1,82 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Башкортостан</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="page-container">
-        {% include 'header.html' %}
+{% extends "base.html" %}
 
-        <main id="content">
-            <section class="intro">
-                <h1>Добро пожаловать в Башкортостан!</h1>
-                <p>Республика с уникальной природой и культурой</p>
-            </section>
-        </main>
-
-        <footer>
-            <p>&copy; 2025 Башкортостан</p>
-        </footer>
+{% block content %}
+<section class="intro">
+    <h1 class="welcome-title"><span class="welcome-ru">Добро пожаловать!</span><span class="welcome-ba">Рәхим итегеҙ!</span></h1>
+    <p>Республика с уникальной природой, богатым культурным наследием и древними традициями</p>
+    
+    <div class="quote-block">
+        <p>«Башкортостан — это удивительный край, где природа создала настоящий музей под открытым небом, а история переплела воедино культуры Востока и Запада»</p>
+        <cite>— Из путеводителя по Башкортостану</cite>
     </div>
+</section>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
-</html>
+<div class="dual-sections">
+    <section class="section-half">
+        <h2>О республике</h2>
+        <div class="content-container">
+            <p>Башкортостан — один из наиболее развитых регионов России, расположенный на стыке Европы и Азии, у южных склонов Урала.</p>
+            
+            <p>Этот уникальный край славится своими природными богатствами и многовековой историей.</p>
+            
+            <p>Площадь республики составляет 143,6 тыс. км², а население — более 4 млн человек. Столица — город Уфа, крупный культурный, научный и промышленный центр.</p>
+        </div>
+    </section>
+
+    <section class="section-half">
+        <h2>Интересные факты</h2>
+        <div class="info-panel">
+            <ul class="styled-list">
+                <li>Башкирский мед считается одним из лучших в мире</li>
+                <li>Здесь находится знаменитая пещера Шульган-Таш (Капова) с наскальными рисунками возрастом более 15 000 лет</li>
+                <li>Башкирия вошла в состав России в 1557 году добровольно</li>
+                <li>В республике два государственных языка: русский и башкирский</li>
+            </ul>
+        </div>
+    </section>
+</div>
+
+<section>
+    <h2>Поподробнее?</h2>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-card-content">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="var(--blue)"><path d="M12 3c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2 2.49 2 4 0 2.21 1.79 4 4 4s4-1.79 4-4c0-1.51 1.08-2.79 2-4-.84 0-2-.69-2-2 0-1.66-1.34-3-3-3z"/></svg>
+                </div>
+                <div class="feature-text-content">
+                    <h3 class="feature-title">Культура и традиции</h3>
+                    <p class="feature-desc">Увлекательный мир национальной культуры, фольклора, музыки и уникальных традиций башкирского народа.</p>
+                    <a href="{{ url_for('culture') }}" class="feature-link blue-link">Узнать больше</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-card-content">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" fill="var(--green)"><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2L7 10l-5 7h18l-6-11z"/></svg>
+                </div>
+                <div class="feature-text-content">
+                    <h3 class="feature-title">Уникальная природа</h3>
+                    <p class="feature-desc">Потрясающие горные массивы, чистейшие озера и многообразие природных зон порадуют каждого путешественника.</p>
+                    <a href="{{ url_for('nature') }}" class="feature-link green-link">Узнать больше</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-card-content">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="60" height="60" fill="#d35400"><path d="M12 2C8.13 2 5 5.13 5 9c0 1.74.5 3.37 1.41 4.84.43.71 1.97 2.83 2.72 3.55.92.9 1.46 1.6 1.87 2.21.4.59.59 1.04.81 1.6.06.15.22.44.34.44s.28-.29.34-.44c.22-.56.41-1.01.81-1.6.42-.61.95-1.31 1.87-2.21.75-.72 2.29-2.84 2.72-3.55.91-1.47 1.41-3.1 1.41-4.84 0-3.87-3.13-7-7-7zm0 9.75c-1.52 0-2.75-1.23-2.75-2.75S10.48 6.25 12 6.25s2.75 1.23 2.75 2.75-1.23 2.75-2.75 2.75z"/></svg>
+                </div>
+                <div class="feature-text-content">
+                    <h3 class="feature-title">Достопримечательности</h3>
+                    <p class="feature-desc">Знаменитые музеи, исторические памятники, архитектурные шедевры и другие обязательные к посещению места.</p>
+                    <a href="{{ url_for('places') }}" class="feature-link orange-link">Узнать больше</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

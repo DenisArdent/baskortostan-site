@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dark-auth-overlay" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000;">
+    <div class="dark-auth-container">
+        <div class="dark-auth-header">
+            <h1>Регистрация</h1>
+        </div>
+        
+        <div class="social-login-grid">
+            <a href="#" class="social-btn yandex-btn">
+                <img src="{{ url_for('static', filename='img/social/yandex.svg') }}" alt="Яндекс" class="social-icon-svg">
+            </a>
+            <a href="#" class="social-btn vk-btn">
+                <img src="{{ url_for('static', filename='img/social/vk.svg') }}" alt="ВКонтакте" class="social-icon-svg">
+            </a>
+        </div>
+        
+        <div class="dark-auth-divider">
+            <span>Или заполните форму</span>
+        </div>
+        
+        <div class="dark-auth-form">
+            <form action="{{ url_for('register') }}" method="post">
+                {{ form.hidden_tag() }}
+                <div class="dark-form-group">
+                    {{ form.username(size=32, class="dark-form-control", placeholder="Имя пользователя") }}
+                    {% for error in form.username.errors %}
+                    <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="dark-form-group">
+                    {{ form.email(size=64, class="dark-form-control", placeholder="Почта") }}
+                    {% for error in form.email.errors %}
+                    <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="dark-form-group">
+                    {{ form.password(size=32, class="dark-form-control", placeholder="Пароль") }}
+                    {% for error in form.password.errors %}
+                    <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="dark-form-group">
+                    {{ form.password2(size=32, class="dark-form-control", placeholder="Повторите пароль") }}
+                    {% for error in form.password2.errors %}
+                    <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="dark-form-group remember-me">
+                    <input type="checkbox" id="agreement" name="agreement" required>
+                    <label for="agreement">Даю согласие на обработку моих персональных данных</label>
+                </div>
+                <div class="dark-form-actions">
+                    <button type="submit" class="dark-btn-primary" disabled>Зарегистрироваться</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="dark-auth-links">
+            <a href="{{ url_for('login') }}" class="dark-register-link">Уже есть аккаунт? Войти</a>
+        </div>
+        
+        <div class="dark-auth-close">
+            <a href="{{ url_for('index') }}" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 28px;">&times;</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

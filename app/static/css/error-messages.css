@@ -1,0 +1,34 @@
+/* Стили для отображения сообщений об ошибках в формах */
+.error-message {
+    padding: 10px 12px;
+    margin-top: 15px;
+    border-radius: 4px;
+    background-color: rgba(255, 235, 235, 0.7);
+    border: 1px solid #ffd0d0;
+    color: #d42626;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.error-message ul {
+    margin: 8px 0;
+    padding-left: 20px;
+    text-align: left;
+}
+
+.error-message li {
+    margin-bottom: 5px;
+}
+
+/* Анимация появления сообщения об ошибке */
+.error-message.show {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

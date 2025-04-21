@@ -1,15 +1,42 @@
 <header>
-    <nav class="navbar">
-        <div class="logo">
-            <span>Башкортостан</span>
-            <span id="page-title"> / {{ current_page }}</span>
+    <!-- Верхняя панель: только логотип по центру -->
+    <div class="top-header">
+        <div class="container center-logo">
+            <div class="logo">
+                <a href="{{ url_for('index') }}" class="logo-link">Башкортостан</a>
+            </div>
         </div>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('index') }}" data-page="home">Главная</a></li>
-            <li><a href="{{ url_for('culture') }}" data-page="culture">Культура</a></li>
-            <li><a href="{{ url_for('nature') }}" data-page="nature">Природа</a></li>
-            <li><a href="{{ url_for('places') }}" data-page="places">Достопримечательности</a></li>
-            <li><a href="{{ url_for('contact') }}" data-page="contact">Связаться с нами</a></li>
-        </ul>
+    </div>
+    
+    <!-- Основная навигация -->
+    <nav class="main-nav">
+        <div class="container">
+            <span class="current-page-display">{{ current_page }}</span>
+            
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}" data-page="home" {% if active_page == 'home' %}class="active"{% endif %}>Главная</a></li>
+                <li><a href="{{ url_for('culture') }}" data-page="culture" {% if active_page == 'culture' %}class="active"{% endif %}>Культура</a></li>
+                <li><a href="{{ url_for('nature') }}" data-page="nature" {% if active_page == 'nature' %}class="active"{% endif %}>Природа</a></li>
+                <li><a href="{{ url_for('places') }}" data-page="places" {% if active_page == 'places' %}class="active"{% endif %}>Достопримечательности</a></li>
+                <li><a href="{{ url_for('contact') }}" data-page="contact" {% if active_page == 'contact' %}class="active"{% endif %}>Связаться с нами</a></li>
+            </ul>
+            
+            <div class="right-menu">
+                <div class="nav-auth">
+                    {% if current_user.is_authenticated %}
+                    <span class="user-greeting">Привет, {{ current_user.username }}!</span>
+                    <a href="{{ url_for('logout') }}" class="auth-link">Выйти</a>
+                    {% else %}
+                    <a href="javascript:void(0)" class="auth-link login-button" onclick="return showLoginForm()">Войти</a>
+                    {% endif %}
+                </div>
+                
+                <div class="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
     </nav>
 </header>

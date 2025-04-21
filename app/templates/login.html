@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dark-auth-overlay" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000;">
+    <div class="dark-auth-container">
+        <div class="dark-auth-header">
+            <h1>Вход</h1>
+        </div>
+        
+        <div class="social-login-grid">
+            <a href="#" class="social-btn yandex-btn">
+                <span class="social-icon">Я</span>
+            </a>
+            <a href="#" class="social-btn vk-btn">
+                <span class="social-icon">VK</span>
+            </a>
+        </div>
+        
+        <div class="dark-auth-divider">
+            <span>С паролем</span>
+        </div>
+        
+        <div class="dark-auth-form">
+            <form action="{{ url_for('login') }}" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="dark-form-group">
+                    {{ form.username(size=32, class="dark-form-control", placeholder="Почта") }}
+                </div>
+                <div class="dark-form-group">
+                    {{ form.password(size=32, class="dark-form-control", placeholder="Пароль") }}
+                </div>
+
+                <div class="dark-form-actions">
+                    <button type="submit" class="dark-btn-primary" disabled>Войти</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="dark-auth-links">
+            <a href="{{ url_for('register') }}" class="dark-register-link">Зарегистрироваться</a>
+        </div>
+        
+        <div class="dark-auth-close">
+            <a href="{{ url_for('index') }}" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 28px;">&times;</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
