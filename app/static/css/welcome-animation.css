@@ -18,6 +18,25 @@
     width: 100%;
     opacity: 0;
     transform: translateY(10px);
+    font-weight: bold;
+}
+
+/* Создаём три отдельных слоя для цветов флага */
+.welcome-ba .blue-part {
+    color: var(--blue);
+}
+
+.welcome-ba .white-part {
+    color: white;
+    /* Четкий темный контур только для белой части */
+    text-shadow: 
+       -1px -1px 0 #000,  
+        1px -1px 0 #000,
+       -1px  1px 0 #000,
+        1px  1px 0 #000;
+}
+
+.welcome-ba .green-part {
     color: var(--green);
 }
 

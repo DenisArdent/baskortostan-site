@@ -24,8 +24,30 @@
             <div class="right-menu">
                 <div class="nav-auth">
                     {% if current_user.is_authenticated %}
-                    <span class="user-greeting">Привет, {{ current_user.username }}!</span>
-                    <a href="{{ url_for('logout') }}" class="auth-link">Выйти</a>
+                    <div class="profile-dropdown">
+                        <div class="profile-icon">
+                            <img src="{{ url_for('static', filename='img/profile/profile-icon.svg') }}" alt="Профиль" onerror="this.onerror=null; this.src='/static/img/profile/default-avatar.svg';">
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-header">{{ current_user.username }}</div>
+                            <a href="{{ url_for('profile') }}" class="dropdown-item">Профиль</a>
+                            <a href="#" class="dropdown-item">Мои обращения</a>
+                            <a href="{{ url_for('logout') }}" class="dropdown-item">Выйти</a>
+                        </div>
+                        
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                <div class="profile-notifications">
+                                    {% for category, message in messages %}
+                                        <div class="flash-message flash-{{ category }}">
+                                            {{ message }}
+                                            <span class="close-flash">&times;</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
                     {% else %}
                     <a href="javascript:void(0)" class="auth-link login-button" onclick="return showLoginForm()">Войти</a>
                     {% endif %}

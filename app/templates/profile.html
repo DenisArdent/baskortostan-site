@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-page">
+    
+    <div class="container">
+        <div class="profile-wrapper">
+                <!-- Блок изменения имени -->
+                <div class="content-section">
+                    <h2>Личные данные</h2>
+                    <div class="user-info">
+                        <p><strong>Email:</strong> {{ current_user.email }}</p>
+                        <p><strong>На сайте с:</strong> {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
+                    </div>
+                    <form method="POST" action="{{ url_for('profile') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group">
+                            {{ form.username.label }}
+                            {{ form.username(class="form-control") }}
+                            {% for error in form.username.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Блок изменения пароля -->
+                <div class="content-section">
+                    <h2>Изменение пароля</h2>
+                    <form method="POST" action="{{ url_for('profile') }}" class="password-form">
+                        {{ form.hidden_tag() }}
+                        {{ form.username(style="display: none;") }}
+                        
+                        <div class="form-group">
+                            {{ form.current_password.label }}
+                            {{ form.current_password(class="form-control", placeholder="Введите текущий пароль") }}
+                            {% for error in form.current_password.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form.new_password.label }}
+                            {{ form.new_password(class="form-control", placeholder="Не менее 6 символов") }}
+                            {% for error in form.new_password.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form.confirm_password.label }}
+                            {{ form.confirm_password(class="form-control", placeholder="Повторите новый пароль") }}
+                            {% for error in form.confirm_password.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Изменить пароль</button>
+                        </div>
+                    </form>
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Добавляем обработчики для закрытия flash-сообщений
+        const closeButtons = document.querySelectorAll('.close-flash');
+        
+        closeButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                const flashMessage = this.parentElement;
+                flashMessage.style.opacity = '0';
+                setTimeout(function() {
+                    flashMessage.style.display = 'none';
+                }, 300);
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,5 +1,76 @@
 /* Enhanced Layout - Улучшенный макет для сайта Башкортостан */
 
+/* Стили для выпадающего меню профиля */
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+.profile-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.profile-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--blue);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0 0 8px 8px;
+    width: 200px;
+    display: none;
+    margin-top: 10px; /* Добавляем отступ сверху в 2 пикселя */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: -1; /* Отрицательный z-index для отображения под навигационной панелью */
+}
+
+/* Добавляем класс для показа меню при клике */
+.profile-dropdown.show .dropdown-menu {
+    display: block;
+}
+
+.dropdown-header {
+    padding: 12px 16px;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    /* Добавляем обработку длинных имен пользователей */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 10px 16px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
 /* Улучшение общей типографики */
 html, body {
     font-size: 16px; /* Базовый размер шрифта увеличен */

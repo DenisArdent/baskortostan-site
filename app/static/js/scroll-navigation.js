@@ -97,25 +97,31 @@ function handleScroll(event) {
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    // Добавляем обработчик события колёсика мыши
-    window.addEventListener('wheel', handleScroll, { passive: false });
+    // Проверяем, не находимся ли мы на странице профиля
+    // Если URL содержит '/profile', не активируем навигацию скроллом
+    const isProfilePage = window.location.pathname.includes('/profile');
     
-    // Добавляем обработчик для тач-устройств
-    let touchStartY = 0;
-    
-    window.addEventListener('touchstart', function(e) {
-        touchStartY = e.touches[0].clientY;
-    }, { passive: true });
-    
-    window.addEventListener('touchend', function(e) {
-        const touchEndY = e.changedTouches[0].clientY;
-        const touchDiff = touchStartY - touchEndY;
+    if (!isProfilePage) {
+        // Добавляем обработчик события колёсика мыши
+        window.addEventListener('wheel', handleScroll, { passive: false });
         
-        // Эмуляция события колёсика
-        if (Math.abs(touchDiff) > 50) {
-            handleScroll({ deltaY: touchDiff });
-        }
-    }, { passive: true });
+        // Добавляем обработчик для тач-устройств
+        let touchStartY = 0;
+        
+        window.addEventListener('touchstart', function(e) {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        window.addEventListener('touchend', function(e) {
+            const touchEndY = e.changedTouches[0].clientY;
+            const touchDiff = touchStartY - touchEndY;
+            
+            // Эмуляция события колёсика
+            if (Math.abs(touchDiff) > 50) {
+                handleScroll({ deltaY: touchDiff });
+            }
+        }, { passive: true });
+    }
     
     // Проверяем, есть ли хеш в URL для прокрутки к определенной секции
     if (window.location.hash) {

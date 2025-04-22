@@ -29,10 +29,25 @@ header {
     width: 100%;
     color: var(--white);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-    position: relative;
+    position: fixed; /* Фиксированная позиция */
     left: 0;
     right: 0;
-    overflow: hidden;
+    top: 0; /* Привязка к верху окна */
+    overflow: visible; /* Для корректного отображения выпадающего меню */
+    z-index: 1000; /* Высокий z-index чтобы меню было поверх контента */
+}
+
+/* Улучшенные анимации при переходе */
+header.transitioning {
+    /* Используем will-change для предупреждения браузера о будущих анимациях */
+    will-change: transform, opacity;
+}
+
+/* Плавные переходы для элементов хедера с разными настройками для повышения плавности */
+header.transitioning * {
+    transition-property: transform, opacity, visibility;
+    transition-duration: 0.35s;
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 /* Общий контейнер для содержимого */
@@ -59,18 +74,30 @@ header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     width: 100%;
     box-sizing: border-box;
+    will-change: opacity, transform;
+    overflow: hidden;
+    transform-origin: center top; /* Задаем точку трансформации для более плавного эффекта */
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    /* Используем z-index для четкого разделения */
+    z-index: 15;
+    position: relative;
 }
 
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
     letter-spacing: 0.5px;
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    will-change: opacity, transform;
+    /* Делаем backface-visibility: hidden для улучшения рендеринга */
+    backface-visibility: hidden;
 }
 
 .logo-link {
     color: var(--white);
     text-decoration: none;
     transition: color 0.2s ease;
+    padding-left: 15px; /* Добавляем отступ слева */
 }
 
 .logo-link:hover {
@@ -85,17 +112,87 @@ header {
     width: 100%;
     box-sizing: border-box;
     overflow: visible;
+    z-index: 10; /* z-index меньше, чем у top-header для корректного порядка слоев */
+    will-change: transform;
+    transform-origin: center top; /* Задаем точку трансформации для более плавного эффекта */
+    transition: transform 0.4s ease-in-out;
+}
+
+/* Фиксированная навигация после прокрутки */
+.main-nav.nav-fixed {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(0) !important; /* Навигация перемещается в верх */
+    top: 0;
+    position: fixed; /* Гарантируем фиксированную позицию */
+}
+
+/* Класс для скрытой верхней панели */
+.header-hidden .top-header {
+    height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    /* Полностью скрываем из потока */
+    visibility: hidden !important;
+    transform: translateY(-100%) !important;
+}
+
+/* Логотип в навигационной панели (изначально скрыт) */
+.nav-logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right: 1.5rem;
+    will-change: opacity;
+    pointer-events: none; /* Отключаем события мыши при прозрачности */
+    /* Используем задержку для появления логотипа, чтобы избежать перекрытия с верхним логотипом */
+    transition: opacity 0.35s ease-in-out;
+    /* Делаем backface-visibility: hidden для улучшения рендеринга */
+    backface-visibility: hidden;
+    /* Предотвращаем мерцание текста */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Улучшаем точную позицию */
+    transform: translateZ(0);
+    
+    /* Фиксируем высоту и ширину, чтобы предотвратить дрыганье */
+    min-width: 120px;
+    display: block;
+    position: absolute;
+    left: 0;
+    /* Гарантируем, что невидимый логотип не влияет на макет */
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Логотип становится видимым при прокрутке */
+.nav-logo.visible {
+    opacity: 1 !important;
+    pointer-events: auto; /* Восстанавливаем события мыши */
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Стиль для логотипа в навигации */
+.nav-logo .logo-link {
+    white-space: nowrap;
+    color: var(--white);
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 .main-nav .container {
     position: relative;
     max-width: 100%;
     padding-right: 0;
+    padding-left: 140px; /* Добавляем отступ слева для компенсации места под логотип */
 }
 
 .current-page-display {
     font-size: 1.1rem;
     opacity: 0.9;
+    position: relative; /* Позиционируем индикатор текущей страницы */
+    z-index: 1; /* Выше, чем навигационный логотип */
     display: none; /* Скрыто на больших экранах, будет видно на мобильных */
 }
 
@@ -104,6 +201,8 @@ header {
     list-style: none;
     margin: 0;
     padding: 0;
+    position: relative; /* Добавляем позиционирование для скролл-индикатора */
+    z-index: 5; /* Добавляем z-index для навигации */
     flex: 1;
     justify-content: center;
     gap: 1.5rem;
@@ -158,9 +257,16 @@ main {
     flex: 1;
     max-width: 1200px;
     width: 100%;
-    margin: 2rem auto;
+    margin: 0.05rem auto 0.5rem;
     padding: 0 1rem;
     animation: fadeIn 0.5s ease;
+    margin-top: 104px; /* Добавляем отступ сверху равный высоте шапки (top-header + main-nav) */
+    transition: margin-top 0.3s ease;
+}
+
+/* Корректируем отступ сверху при скрытой верхней панели */
+.header-hidden main {
+    margin-top: 48px; /* Точная высота только навигационного меню */
 }
 
 @keyframes fadeIn {
@@ -173,8 +279,8 @@ section {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-    padding: 1.5rem 2rem 2rem 2rem;
-    margin-bottom: 2rem;
+    padding: 0.8rem 2rem 2rem 2rem;
+    margin-bottom: 1rem;
 }
 
 /* Стили для сетки функций на главной странице */
@@ -463,11 +569,16 @@ footer p {
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     border: 1px solid #e0e0e0;
+    overflow: hidden !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    max-height: none !important;
 }
 
 .auth-container h1 {
     margin-top: 0;
-    color: #333;
+    color: #aaa;
     text-align: center;
     margin-bottom: 1.5rem;
     font-size: 1.6rem;
@@ -574,6 +685,9 @@ footer p {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    overflow: hidden !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
 }
 
 .dark-auth-container {
@@ -581,6 +695,11 @@ footer p {
     max-width: 90%;
     position: relative;
     color: #fff;
+    overflow: hidden !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    max-height: none !important;
 }
 
 .dark-auth-header {
@@ -592,7 +711,7 @@ footer p {
     font-size: 28px;
     font-weight: 500;
     margin-bottom: 5px;
-    color: #fff;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .dark-auth-subtitle {
@@ -1380,7 +1499,6 @@ footer p {
     background-color: #003d7a;
 }
 
-<style>
 /* Основные стили для модального окна */
 .modal {
     display: none;
@@ -1476,7 +1594,8 @@ footer p {
 }
 
 .nature-image:hover {
-    transform: scale(1.02);
+    filter: brightness(1.05);
+    /* Removed transform scale to avoid conflict with card hover */
 }
 
 /* Стили для слайдера */
