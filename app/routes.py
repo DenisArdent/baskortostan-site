@@ -2,7 +2,7 @@ from flask import render_template, request, jsonify, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
 from app import app, db
 from app.models import User
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, ProfileForm
 
 # Навигационные элементы
 nav_items = [
@@ -135,27 +135,27 @@ def login():
     if request.method == 'POST':
         # Для AJAX-запроса из модального окна
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            username = request.form.get('username')
+            email = request.form.get('email')
             password = request.form.get('password')
             remember_me = request.form.get('remember_me') == 'on'
             
-            if not username or not password:
-                return jsonify({'success': False, 'message': 'Введите имя пользователя и пароль'})
+            if not email or not password:
+                return jsonify({'success': False, 'message': 'Введите email и пароль'})
             
-            user = User.query.filter_by(username=username).first()
+            user = User.query.filter_by(email=email).first()
             
             if user is None or not user.check_password(password):
-                return jsonify({'success': False, 'message': 'Неверное имя пользователя или пароль'})
+                return jsonify({'success': False, 'message': 'Неверный email или пароль'})
             
             login_user(user, remember=remember_me)
             return jsonify({'success': True, 'message': 'Вы успешно вошли в систему'})
         
         # Для обычного запроса (не AJAX)
         elif form.validate_on_submit():
-            user = User.query.filter_by(username=form.username.data).first()
+            user = User.query.filter_by(email=form.email.data).first()
             
             if user is None or not user.check_password(form.password.data):
-                flash('Неверное имя пользователя или пароль', 'error')
+                flash('Неверный email или пароль', 'error')
                 return redirect(url_for('login'))
             
             login_user(user, remember=form.remember_me.data)
@@ -215,3 +215,49 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    form = ProfileForm(original_username=current_user.username)
+    
+    if form.validate_on_submit():
+        # Отслеживаем, было ли изменено имя пользователя
+        username_changed = False
+        if form.username.data != current_user.username:
+            current_user.username = form.username.data
+            username_changed = True
+            
+        # Отслеживаем, был ли изменен пароль
+        password_changed = False
+        if form.current_password.data and form.new_password.data and form.confirm_password.data:
+            # Проверяем, правильно ли введен текущий пароль
+            if not current_user.check_password(form.current_password.data):
+                flash('Неверный текущий пароль', 'error')
+                return redirect(url_for('profile'))
+            
+            # Обновляем пароль
+            current_user.set_password(form.new_password.data)
+            password_changed = True
+        
+        # Сохраняем изменения
+        db.session.commit()
+        
+        # Показываем соответствующие уведомления
+        if password_changed:
+            flash('Пароль успешно изменен', 'success')
+        if username_changed:
+            flash('Данные профиля успешно обновлены', 'success')
+        
+        return redirect(url_for('profile'))
+    elif request.method == 'GET':
+        # Предзаполняем форму текущими данными пользователя
+        form.username.data = current_user.username
+    
+    return render_template('profile.html',
+                          title='Профиль',
+                          current_page='Профиль',
+                          active_page='profile',
+                          form=form,
+                          nav_items=nav_items)

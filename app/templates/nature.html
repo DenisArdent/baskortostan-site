@@ -1,57 +1,703 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section>
-    <h1>Природа</h1>
-    <p class="nature-description">Регион славится живописными горами, лесами, реками и уникальными природными заповедниками. Башкортостан — один из красивейших и разнообразных по природным условиям регионов России.</p>
-</section>
-
-<section>
-    <h2>Уникальные объекты</h2>
+<style>
+    /* Основной контейнер */
+    .main-container {
+        padding-top: 2rem;
+    }
+    :root {
+        --green: #2ecc71;
+        --light-green: #eaffef;
+        --dark-green: #27ae60;
+    }
     
-    <article class="nature-article">
-        <h2>Гора Ямантау</h2>
-        <div>
-            <img src="{{ url_for('static', filename='img/yamantau.jpg') }}" alt="Гора Ямантау" class="nature-image modal-trigger" data-target="modal-yamantau">
-        </div>
-        <div>
-            <p class="nature-text">Высочайшая точка Южного Урала с высотой 1640 м над уровнем моря. Название горы переводится с башкирского как «Злая гора» или «Гора бед». Это место окутано множеством легенд и мифов, связанных с древними верованиями башкир.</p>
-            <a href="javascript:void(0)" class="nature-link modal-trigger" data-target="modal-yamantau">Узнать больше о горе Ямантау &rarr;</a>
-        </div>
-    </article>
+    /* Стили для заголовка страницы */
+    .nature-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
 
-    <article class="nature-article">
-        <h2>Река Белая (Агидель)</h2>
-        <div>
-            <img src="{{ url_for('static', filename='img/white-river.jpg') }}" alt="Река Белая" class="nature-image modal-trigger" data-target="modal-river">
-        </div>
-        <div>
-            <p class="nature-text">Основная водная артерия Башкортостана, на башкирском языке называется Агидель. Протяженность реки составляет более 1400 км. Река Белая — популярный маршрут для водного туризма, сплавов и рыбалки.</p>
-            <a href="javascript:void(0)" class="nature-link modal-trigger" data-target="modal-river">Узнать больше о реке Белой  &rarr;</a>
-        </div>
-    </article>
-</section>
-
-<section>
-    <h2>Природные заповедники</h2>
-    <p>На территории Башкортостана расположены уникальные природные заповедники, сохраняющие биоразнообразие региона:</p>
+    .nature-header h1 {
+        font-size: 2.4rem;
+        margin-bottom: 1rem;
+        color: #333;
+        position: relative;
+        display: inline-block;
+        min-width: 180px;
+        overflow: hidden;
+        text-align: center;
+        width: 100%;
+    }
     
-    <div class="culture-block">
-        <h3>Башкирский государственный заповедник</h3>
-        <p>Основан в 1930 году, является одним из старейших заповедников России. Здесь охраняются реликтовые виды растений и уникальные природные комплексы.</p>
+    .nature-header h1:after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 3px;
+        background: var(--green); /* Зеленая линия */
+        margin: 5px auto 0;
+    }
+    
+    .nature-header .primary-lang {
+        display: inline-block;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    
+    .nature-header .secondary-lang {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        font-weight: bold;
+        color: var(--green); /* Зеленый текст для башкирского языка */
+    }
+    
+    .nature-header h1:hover .primary-lang {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    
+    .nature-header h1:hover .secondary-lang {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* Описание природы */
+    .nature-description {
+        font-size: 1.2rem;
+        line-height: 1.6;
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto 2rem;
+        color: #555;
+    }
+    
+    /* Карточки природных объектов */
+    .nature-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .nature-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border-radius: 10px;
+    }
+
+    /* Fix for the top border issue */
+    .nature-card .nature-image-container {
+        margin-top: -1px;
+        margin-left: -1px;
+        margin-right: -1px;
+        width: calc(100% + 2px);
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+    
+    /* Card hover effects */
+    .nature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-color: #d0d0d0;
+    }
+    
+    .nature-image-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 60%;
+        background-color: transparent;
+        overflow: hidden;
+        border: none;
+        outline: none;
+        margin-top: -1px;
+        margin-left: -1px;
+        margin-right: -1px;
+        width: calc(100% + 2px);
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+    
+    .nature-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.5s ease;
+        opacity: 0;
+        will-change: transform, opacity;
+        border: none;
+        outline: none;
+        margin: 0;
+        padding: 0;
+        display: block; /* Prevents any extra space */
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+    
+    .nature-image.loaded {
+        opacity: 1;
+    }
+    
+    /* Removed image hover effect */
+    
+    .nature-content {
+        padding: 0.8rem 1.5rem 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .nature-card h3 {
+        margin-top: 0.2rem;
+        margin-bottom: 0.8rem;
+        font-size: 1.3rem;
+        color: #333;
+        font-weight: 600;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .nature-text {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+        font-size: 0.95rem;
+    }
+    
+    .nature-link {
+        display: block;
+        width: 70%;
+        margin: 1.2rem auto 0.5rem;
+        padding: 0.75rem 1.2rem;
+        text-align: center;
+        background: linear-gradient(to right, #2e7d32, #43a047);
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        border: none;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        font-size: 0.95rem;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .nature-link:hover, .nature-link:focus {
+        text-decoration: none;
+        color: white;
+    }
+    
+    .nature-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, #43a047, #66bb6a);
+        transition: all 0.4s ease;
+        z-index: -1;
+    }
+    
+    .nature-link:hover {
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .nature-link:hover::before {
+        left: 0;
+    }
+    
+    /* Center the text without the extra part */
+    .nature-content {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    /* Стили для заповедников */
+    .reserves-section {
+        margin: 4rem 0;
+    }
+    
+    .reserves-title {
+        text-align: center;
+        margin-bottom: 2rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .reserves-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: var(--green);
+        border-radius: 3px;
+    }
+    
+    .reserves-description {
+        text-align: center;
+        font-size: 1.1rem;
+        color: #555;
+        max-width: 800px;
+        margin: 0 auto 2rem;
+    }
+    
+    .reserves-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .reserve-card {
+        background: var(--light-green);
+        border-radius: 8px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--green);
+    }
+    
+    .reserve-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .reserve-card h3 {
+        margin-top: 0;
+        color: var(--dark-green);
+        margin-bottom: 0.5rem;
+    }
+    
+    .reserve-card p {
+        margin: 0;
+        color: #555;
+        line-height: 1.5;
+    }
+    
+    .reserve-card .founded {
+        display: block;
+        color: #777;
+        font-size: 0.9rem;
+        margin-top: 1rem;
+    }
+    
+    /* Минималистичные стили для модальных окон */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(3px);
+        transition: all 0.3s ease;
+        overflow: hidden !important;
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
+    }
+    
+    /* Полный запрет скроллинга для всех элементов внутри модальных окон */
+    .modal *, .modal-content *, .slider-container *, .slider *,
+    .slide *, .modal-info * {
+        overflow: hidden !important;
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
+        scrollbar-width: none !important; /* Firefox */
+        -ms-overflow-style: none !important; /* IE and Edge */
+    }
+    
+    /* Скрываем полосы прокрутки в WebKit браузерах */
+    .modal *::-webkit-scrollbar,
+    .modal-content *::-webkit-scrollbar,
+    .slider-container *::-webkit-scrollbar,
+    .slider *::-webkit-scrollbar,
+    .slide *::-webkit-scrollbar,
+    .modal-info *::-webkit-scrollbar {
+        width: 0 !important;
+        height: 0 !important;
+        display: none !important;
+    }
+
+    .modal-content {
+        background-color: white;
+        max-width: 700px;
+        width: 90%;
+        max-height: 90vh;
+        overflow: hidden !important;
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
+        position: relative;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+        border-radius: 6px;
+        animation: modal-appear 0.35s ease-out forwards;
+        padding-top: 15px;
+        height: auto !important;
+    }
+
+    @keyframes modal-appear {
+        from {
+            opacity: 0;
+            transform: translateY(15px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+        color: #777;
+        width: 32px;
+        height: 32px;
+        font-size: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .modal-close:hover {
+        color: #333;
+        transform: scale(1.1);
+    }
+
+    /* Минималистичный слайдер */
+    .slider-container {
+        position: relative;
+        height: 45vh;
+        max-height: 400px;
+        background: none !important;
+        background-color: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        outline: none !important;
+    }
+
+    .slider {
+        position: relative;
+        height: 100%;
+        width: 100%;
+    }
+
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        padding: 0 !important;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        background: none !important;
+        background-color: transparent !important;
+        overflow: visible;
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    .slide.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .slide {
+        /* Оставляем слайд как контейнер для центрирования */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .slide img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; /* Сохраняем оригинальные пропорции */
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        transition: opacity 0.5s ease;
+        will-change: opacity;
+        backface-visibility: hidden;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: none !important;
+        background-color: transparent !important;
+    }
+
+    /* Стили для слайдера */
+
+    .slider-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 36px;
+        height: 36px;
+        background-color: rgba(119, 119, 119, 0.7);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        z-index: 5;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .slider-arrow:hover {
+        background-color: rgba(85, 85, 85, 0.85);
+        transform: translateY(-50%);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    .slider-arrow.prev {
+        left: 10px;
+    }
+
+    .slider-arrow.next {
+        right: 10px;
+    }
+
+    .slider-dots {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 8px 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.1), transparent);
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: rgba(255,255,255,0.6);
+        cursor: pointer;
+        transition: all 0.25s ease;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .dot.active {
+        background-color: rgba(76, 175, 80, 0.7);
+        transform: scale(1.2);
+        border-color: rgba(255,255,255,0.9);
+    }
+
+    /* Информационный блок */
+    
+    .modal-info {
+        padding: 0.5rem 0.8rem 0.8rem;
+        font-size: 0.95rem;
+        color: #555;
+        margin-top: 0;
+        border-left: none;
+        background-color: rgba(76, 175, 80, 0.03);
+        margin-left: 0;
+        overflow: hidden !important;
+        overflow-y: hidden !important;
+        overflow-x: hidden !important;
+    }
+    
+    .modal-info p {
+        margin: 0.6rem 0;
+        line-height: 1.5;
+        padding-left: 0;
+    }
+    
+    .modal-info p:last-child {
+        margin-top: 1rem;
+        padding-top: 0.8rem;
+        border-top: 1px solid rgba(76, 175, 80, 0.15);
+    }
+    
+    .modal-info strong {
+        color: #3a7d3e;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+<div class="main-container">
+<section>
+    <div class="nature-header">
+        <h1>
+            <span class="primary-lang">Природа</span>
+            <span class="secondary-lang">Тәбиғәт</span>
+        </h1>
+        <p class="nature-description">Регион славится живописными горами, лесами, реками и уникальными природными заповедниками. Башкортостан — один из красивейших и разнообразных по природным условиям регионов России.</p>
     </div>
+</section>
+
+<section>
+    <h2 class="section-title">Уникальные природные объекты</h2>
     
-    <div class="culture-block">
-        <h3>Шульган-Таш</h3>
-        <p>Заповедник, созданный для охраны Каповой пещеры с древнейшими наскальными рисунками эпохи палеолита, включенный в список Всемирного наследия ЮНЕСКО.</p>
+    <div class="nature-cards">
+        <div class="nature-card">
+            <div class="nature-image-container">
+                <img src="{{ url_for('static', filename='img/yamantau.jpg') }}" alt="Гора Ямантау" class="nature-image modal-trigger" data-target="modal-yamantau">
+            </div>
+            <div class="nature-content">
+                <h3>Гора Ямантау</h3>
+                <p class="nature-text">Высочайшая точка Южного Урала с высотой 1640 м над уровнем моря. Название горы переводится с башкирского как «Злая гора» или «Гора бед». Это место окутано множеством легенд и мифов, связанных с древними верованиями башкир.</p>
+                <a href="javascript:void(0)" class="nature-link modal-trigger" data-target="modal-yamantau">Узнать больше</a>
+            </div>
+        </div>
+
+        <div class="nature-card">
+            <div class="nature-image-container">
+                <img src="{{ url_for('static', filename='img/white-river.jpg') }}" alt="Река Белая" class="nature-image modal-trigger" data-target="modal-river">
+            </div>
+            <div class="nature-content">
+                <h3>Река Белая (Агидель)</h3>
+                <p class="nature-text">Основная водная артерия Башкортостана, на башкирском языке называется Агидель. Протяженность реки составляет более 1400 км. Река Белая — популярный маршрут для водного туризма, сплавов и рыбалки.</p>
+                <a href="javascript:void(0)" class="nature-link modal-trigger" data-target="modal-river">Узнать больше</a>
+            </div>
+        </div>
+        
+        <div class="nature-card">
+            <div class="nature-image-container">
+                <img src="{{ url_for('static', filename='img/aigir.jpg') }}" alt="Айгирские скалы" class="nature-image modal-trigger" data-target="modal-aigir">
+            </div>
+            <div class="nature-content">
+                <h3>Айгирские скалы</h3>
+                <p class="nature-text">Живописный геологический памятник природы в Белорецком районе Башкортостана. Название в переводе с башкирского означает "жеребец". Одно из самых популярных мест для пешего и конного туризма.</p>
+                <a href="javascript:void(0)" class="nature-link modal-trigger" data-target="modal-aigir">Узнать больше</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="reserves-section">
+    <h2 class="section-title" style="text-align: center; width: 100%;">
+        <span class="primary-lang">Заповедники</span>
+    </h2>
+    <p class="reserves-description" style="max-width: 900px; margin: 1.5rem auto; text-align: center; line-height: 1.7; color: #444; font-size: 1.1rem;">Башкортостан славится своей уникальной системой охраняемых природных территорий, бережно сохраняющих богатейшую природу Урала. Эти заповедные зоны — настоящие сокровищницы редких видов растений и животных, реликтовых лесов и живописных ландшафтов, играющие ключевую роль в поддержании экологического баланса всего региона.</p>
+    
+    <style>
+        .reserves-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .reserve-card {
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            background-image: linear-gradient(white, white), linear-gradient(to right, #009688, #4CAF50);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .reserve-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            background-color: #f8fcf9;
+            background-image: linear-gradient(white, white), linear-gradient(45deg, #009688, #4CAF50);
+            border-width: 2.5px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .reserve-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #2e7d32;
+        }
+        
+        .reserve-card p {
+            flex-grow: 1;
+            margin-bottom: 1.2rem;
+            line-height: 1.6;
+        }
+        
+        .founded {
+            display: inline-block;
+            background-color: rgba(46, 125, 50, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #2e7d32;
+            font-weight: 500;
+        }
+        
+        /* Стили уже определены в основном CSS, используем класс section-title */
+    </style>
+    
+    <div class="reserves-grid">
+        <div class="reserve-card">
+            <h3>Башкирский государственный заповедник</h3>
+            <p>Один из старейших заповедников России, где охраняются реликтовые виды растений и уникальные природные комплексы горно-таежной зоны Южного Урала.</p>
+            <span class="founded">Основан в 1930 году</span>
+        </div>
+        
+        <div class="reserve-card" style="background-image: linear-gradient(white, white), linear-gradient(to right, #2196F3, #03A9F4);" onmouseover="this.style.backgroundImage='linear-gradient(white, white), linear-gradient(45deg, #2196F3, #03A9F4)'; this.style.borderWidth='2.5px';" onmouseout="this.style.backgroundImage='linear-gradient(white, white), linear-gradient(to right, #2196F3, #03A9F4)'; this.style.borderWidth='2px';">
+            <h3>Шульган-Таш</h3>
+            <p>Заповедник, созданный для охраны Каповой пещеры с древнейшими наскальными рисунками эпохи палеолита, а также бурзянской бортевой пчелы.</p>
+            <span class="founded" style="background-color: rgba(33, 150, 243, 0.1); color: #1976D2;">Включен в список Всемирного наследия ЮНЕСКО</span>
+        </div>
+        
+        <div class="reserve-card" style="background-image: linear-gradient(white, white), linear-gradient(to right, #8BC34A, #CDDC39);" onmouseover="this.style.backgroundImage='linear-gradient(white, white), linear-gradient(45deg, #8BC34A, #CDDC39)'; this.style.borderWidth='2.5px';" onmouseout="this.style.backgroundImage='linear-gradient(white, white), linear-gradient(to right, #8BC34A, #CDDC39)'; this.style.borderWidth='2px';">
+            <h3>Южно-Уральский заповедник</h3>
+            <p>Крупнейший заповедник региона, включающий горные хребты, живописные реки и уникальные лесные массивы с разнообразной флорой и фауной.</p>
+            <span class="founded" style="background-color: rgba(139, 195, 74, 0.1); color: #689F38;">Площадь более 250 000 гектаров</span>
+        </div>
     </div>
 </section>
 
 <!-- Модальное окно для Ямантау со слайдером -->
 <div id="modal-yamantau" class="modal">
     <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <h2>Гора Ямантау</h2>
+        <a href="#" class="modal-close">&times;</a>
 
         <!-- Слайдер -->
         <div class="slider-container">
@@ -66,8 +712,8 @@
                     <img src="{{ url_for('static', filename='img/yamantau3.jpg') }}" alt="Ямантау вид 3">
                 </div>
             </div>
-            <button class="slider-arrow prev">❮</button>
-            <button class="slider-arrow next">❯</button>
+            <button class="slider-arrow prev">&#10094;</button>
+            <button class="slider-arrow next">&#10095;</button>
             <div class="slider-dots">
                 <span class="dot active"></span>
                 <span class="dot"></span>
@@ -86,8 +732,7 @@
 <!-- Модальное окно для реки Белой со слайдером -->
 <div id="modal-river" class="modal">
     <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <h2>Река Белая (Агидель)</h2>
+        <a href="#" class="modal-close">&times;</a>
 
         <!-- Слайдер -->
         <div class="slider-container">
@@ -99,8 +744,8 @@
                     <img src="{{ url_for('static', filename='img/white-river2.jpg') }}" alt="Река Белая вид 2">
                 </div>
             </div>
-            <button class="slider-arrow prev">❮</button>
-            <button class="slider-arrow next">❯</button>
+            <button class="slider-arrow prev">&#10094;</button>
+            <button class="slider-arrow next">&#10095;</button>
             <div class="slider-dots">
                 <span class="dot active"></span>
                 <span class="dot"></span>
@@ -115,6 +760,175 @@
     </div>
 </div>
 
+<!-- Модальное окно для Айгирских скал со слайдером -->
+<div id="modal-aigir" class="modal">
+    <div class="modal-content">
+        <a href="#" class="modal-close">&times;</a>
+
+        <!-- Слайдер -->
+        <div class="slider-container">
+            <div class="slider">
+                <div class="slide active">
+                    <img src="{{ url_for('static', filename='img/aigir1.jpg') }}" alt="Айгирские скалы вид 1">
+                </div>
+                <div class="slide">
+                    <img src="{{ url_for('static', filename='img/aigir2.jpg') }}" alt="Айгирские скалы вид 2">
+                </div>
+                <div class="slide">
+                    <img src="{{ url_for('static', filename='img/aigir3.jpg') }}" alt="Айгирские скалы вид 3">
+                </div>
+            </div>
+            <button class="slider-arrow prev">&#10094;</button>
+            <button class="slider-arrow next">&#10095;</button>
+            <div class="slider-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
+        <div class="modal-info">
+            <p><strong>Высота:</strong> около 300-350 метров</p>
+            <p><strong>Местоположение:</strong> Белорецкий район, долина реки Инзер</p>
+            <p>Уникальный природный комплекс, включающий гряду скал над долиной реки Инзер. С вершины скал открывается великолепный вид на горный массив Южного Урала.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Функционал модальных окон
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalTriggers = document.querySelectorAll('.open-modal');
+        const closeButtons = document.querySelectorAll('.modal-close');
+        const modals = document.querySelectorAll('.modal');
+        
+        modalTriggers.forEach(trigger => {
+            trigger.addEventListener('click', function() {
+                const targetModal = document.getElementById(this.dataset.target);
+                targetModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            });
+        });
+        
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const modal = this.closest('.modal');
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            });
+        });
+        
+        window.addEventListener('click', function(event) {
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+        
+        // Функция для слайдера
+        function initSliders() {
+            const sliders = document.querySelectorAll('.slider');
+            
+            sliders.forEach(slider => {
+                const slides = slider.querySelectorAll('.slide');
+                const prevBtn = slider.parentElement.querySelector('.prev');
+                const nextBtn = slider.parentElement.querySelector('.next');
+                const dots = slider.parentElement.querySelectorAll('.dot');
+                let currentSlide = 0;
+                
+                // Функция для переключения слайдов
+                function showSlide(n) {
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    dots.forEach(dot => dot.classList.remove('active'));
+                    
+                    currentSlide = (n + slides.length) % slides.length;
+                    
+                    slides[currentSlide].classList.add('active');
+                    dots[currentSlide].classList.add('active');
+                }
+                
+                // События для кнопок
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => showSlide(currentSlide - 1));
+                }
+                
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => showSlide(currentSlide + 1));
+                }
+                
+                // События для точек
+                dots.forEach((dot, index) => {
+                    dot.addEventListener('click', () => showSlide(index));
+                });
+            });
+        }
+        
+        // Оптимизация загрузки изображений
+        function handleImageLoad() {
+            const images = document.querySelectorAll('.nature-image');
+            
+            images.forEach(img => {
+                if (img.complete) {
+                    img.classList.add('loaded');
+                } else {
+                    img.addEventListener('load', function() {
+                        this.classList.add('loaded');
+                    });
+                }
+            });
+        }
+        
+        // Инициализация функций
+        initSliders();
+        handleImageLoad();
+        
+        // Полностью блокируем скроллинг в модальных окнах
+        function disableScrolling() {
+            const modals = document.querySelectorAll('.modal, .modal-content, .slider-container, .slider, .slide, .modal-info');
+            
+            modals.forEach(modal => {
+                modal.addEventListener('wheel', preventScroll, { passive: false });
+                modal.addEventListener('touchmove', preventScroll, { passive: false });
+                modal.addEventListener('mousewheel', preventScroll, { passive: false });
+                modal.addEventListener('DOMMouseScroll', preventScroll, { passive: false });
+            });
+            
+            // Также применяем ко всем потомкам
+            modals.forEach(modal => {
+                const children = modal.querySelectorAll('*');
+                children.forEach(child => {
+                    child.addEventListener('wheel', preventScroll, { passive: false });
+                    child.addEventListener('touchmove', preventScroll, { passive: false });
+                    child.addEventListener('mousewheel', preventScroll, { passive: false });
+                    child.addEventListener('DOMMouseScroll', preventScroll, { passive: false });
+                });
+            });
+        }
+        
+        function preventScroll(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        
+        // Вызываем функцию блокировки скроллинга
+        disableScrolling();
+        
+        // Принудительно сбрасываем кеш стилей
+        const styleSheets = document.querySelectorAll('style');
+        styleSheets.forEach(sheet => {
+            const parent = sheet.parentNode;
+            const clone = sheet.cloneNode(true);
+            parent.replaceChild(clone, sheet);
+            console.log('CSS cache reset applied');
+        });
+    });
+</script>
+
 <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+</div>
 
 {% endblock %}

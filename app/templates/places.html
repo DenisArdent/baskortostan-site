@@ -13,6 +13,48 @@
             font-size: 2.4rem;
             margin-bottom: 1rem;
             color: #333;
+            position: relative;
+            display: inline-block;
+            min-width: 180px;
+            overflow: hidden;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .places-header h1:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: #d35400; /* Оранжевая линия */
+            margin: 5px auto 0;
+        }
+        
+        .places-header .primary-lang {
+            display: inline-block;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .places-header .secondary-lang {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            font-weight: bold;
+            color: #d35400; /* Оранжевый текст для башкирского языка */
+        }
+        
+        .places-header h1:hover .primary-lang {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        
+        .places-header h1:hover .secondary-lang {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .places-header p {
@@ -37,18 +79,87 @@
             border: none;
             border-radius: 30px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             font-size: 0.95rem;
             color: #555;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Добавляем иконки для кнопок */
+        .category-tab::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            vertical-align: middle;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            filter: none;
+            position: relative;
+        }
+        
+        .category-tab[data-category="all"]::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="%23333"/></svg>');
+        }
+        
+        .category-tab[data-category="all"].active::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="%23ffffff"/></svg>');
+            opacity: 1;
+        }
+        
+        .category-tab[data-category="culture"]::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M12 3c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2 2.49 2 4 0 2.21 1.79 4 4 4s4-1.79 4-4c0-1.51 1.08-2.79 2-4-.84 0-2-.69-2-2 0-1.66-1.34-3-3-3z" fill="%238e44ad"/></svg>');
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            position: relative;
+            top: -1px;
+        }
+        
+        .category-tab[data-category="culture"].active::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M12 3c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2 2.49 2 4 0 2.21 1.79 4 4 4s4-1.79 4-4c0-1.51 1.08-2.79 2-4-.84 0-2-.69-2-2 0-1.66-1.34-3-3-3z" fill="%23ffffff"/></svg>');
+            opacity: 1;
+        }
+        
+        .category-tab[data-category="nature"]::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2L7 10l-5 7h18l-6-11z" fill="%2327ae60"/></svg>');
+            width: 18px;
+            height: 18px;
+        }
+        
+        .category-tab[data-category="nature"].active::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2L7 10l-5 7h18l-6-11z" fill="%23ffffff"/></svg>');
+            opacity: 1;
+        }
+        
+        .category-tab[data-category="historic"]::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="%23d35400"/></svg>');
+        }
+        
+        .category-tab[data-category="historic"].active::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="%23ffffff"/></svg>');
+            opacity: 1;
         }
 
         .category-tab:hover {
             background-color: #e5e5e5;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .category-tab:hover::before {
+            opacity: 1;
         }
 
         .category-tab.active {
             background-color: var(--blue);
             color: white;
+            font-weight: 500;
         }
 
         /* Серый цвет для "Все места" */
@@ -63,6 +174,8 @@
 
         .category-tab[data-category="nature"].active {
             background-color: var(--green);
+            box-shadow: 0 3px 15px rgba(39, 174, 96, 0.4);
+            transform: translateY(-2px);
         }
 
         .category-tab[data-category="historic"].active {
@@ -78,44 +191,114 @@
         .place-card {
             display: flex;
             flex-direction: column;
-            background: white;
+            background: #eee; /* Фоновый цвет во время загрузки */
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             height: 220px;
             position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease;
+            padding: 0;
+            margin: 0;
         }
         
         .place-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Усиление эффекта границы при наведении */
+        .place-card[data-category="culture"]:hover .place-image {
+            border-width: 6px;
+        }
+        
+        .place-card[data-category="nature"]:hover .place-image {
+            border-width: 6px;
+        }
+        
+        .place-card[data-category="historic"]:hover .place-image {
+            border-width: 6px;
         }
 
         .place-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease, opacity 0.5s ease;
+            display: block;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border: 4px solid transparent;
+            /* Оптимизация загрузки */
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            opacity: 0; /* Начинаем с прозрачных изображений */
             position: relative;
-            box-sizing: border-box; /* Рамка включается в размеры элемента */
-            border: 3px solid transparent; /* Начальная прозрачная рамка */
-            border-radius: 6px; /* Закругленные края */
+            z-index: 2; /* Изображение находится над плейсхолдером, но ниже контента */
         }
         
-        /* Рамка для фотографий категории "культура" - фиолетовая */
+        /* Стили для плейсхолдера */
+        .image-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            transition: opacity 0.5s ease;
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Анимация пульсации */
+        .pulse-animation {
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+        }
+        
+        /* Стиль для иконки ошибки */
+        .error-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Индикаторы категорий - явные границы */
         .place-card[data-category="culture"] .place-image {
-            border-color: #8e44ad;
+            /* Фиолетовая граница для культурных объектов */
+            border: 4px solid #8e44ad;
         }
         
-        /* Рамка для фотографий категории "природа" - зеленая */
+        /* Зеленая граница для природных объектов */
         .place-card[data-category="nature"] .place-image {
-            border-color: var(--green);
+            border: 4px solid var(--green);
         }
         
-        /* Рамка для фотографий категории "история" - оранжевая */
+        /* Оранжевая граница для исторических объектов */
         .place-card[data-category="historic"] .place-image {
-            border-color: #d35400;
+            border: 4px solid #d35400;
         }
 
         .place-content {
@@ -131,6 +314,9 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             overflow: auto;
+            border-radius: 8px;
+            z-index: 10; /* Приоритет выше, чем у изображения и плейсхолдера */
+            pointer-events: none; /* По умолчанию не реагирует на клики */
         }
 
         .place-title {
@@ -164,10 +350,24 @@
             gap: 0.3rem;
             margin: 0;
             padding: 0;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .place-location:hover {
+            color: #333;
+        }
+        
+
+        
+        /* Анимируем переходы между карточками */
+        .place-card {
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .place-card:hover .place-content {
             opacity: 1;
+            pointer-events: auto; /* Включаем события мыши при наведении */
         }
 
         .place-card:hover .place-image {
@@ -179,7 +379,7 @@
 {% block content %}
 <section>
     <div class="places-header">
-        <h1>Достопримечательности</h1>
+        <h1><span class="primary-lang">Достопримечательности</span><span class="secondary-lang">Иҫтәлекле урындары</span></h1>
         <p>Республика Башкортостан богата уникальными природными, историческими и культурными объектами, привлекающими туристов со всей России и мира.</p>
     </div>
     
@@ -189,6 +389,8 @@
         <button class="category-tab" data-category="nature">Природные</button>
         <button class="category-tab" data-category="historic">Исторические</button>
     </div>
+    
+
     
     <div class="places-grid">
         <!-- Капова пещера -->
@@ -200,10 +402,10 @@
                     Капова пещера (Шульган-Таш) — карстовая пещера на Южном Урале с наскальными рисунками эпохи палеолита. Является объектом культурного наследия России федерального значения.
                 </p>
                 <div class="place-footer">
-                    <div class="place-location">
+                    <a href="https://yandex.ru/maps/?text=Капова пещера Бурзянский район Башкортостан" class="place-location" target="_blank" rel="noopener noreferrer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                         Бурзянский район
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -217,15 +419,14 @@
                     Соборная мечеть Ляля-Тюльпан — мечеть в Уфе, построенная в 1998 году и названа так из-за внешнего сходства с нераспустившимся цветком тюльпана (ляля-тюльпан). Является одним из символов города.
                 </p>
                 <div class="place-footer">
-                    <div class="place-location">
+                    <a href="https://yandex.ru/maps/?text=Мечеть Ляля-Тюльпан Уфа" class="place-location" target="_blank" rel="noopener noreferrer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                         Уфа
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
-        
-        <!-- Монумент Дружбы -->
+                <!-- Монумент Дружбы -->
         <div class="place-card" data-category="historic">
             <img src="{{ url_for('static', filename='images/monument_friendship.jpg') }}" alt="Монумент Дружбы" class="place-image">
             <div class="place-content">
@@ -234,10 +435,10 @@
                     Монумент Дружбы — памятник, посвящённый 400-летию присоединения Башкирии к России. Монумент был торжественно открыт 7 августа 1965 года в Уфе.
                 </p>
                 <div class="place-footer">
-                    <div class="place-location">
+                    <a href="https://yandex.ru/maps/?text=Монумент Дружбы Уфа" class="place-location" target="_blank" rel="noopener noreferrer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                         Уфа
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -251,10 +452,10 @@
                     Национальный музей Республики Башкортостан — один из старейших музеев России, основанный в 1864 году. Экспозиции музея посвящены природе, истории, этнографии и культуре Башкортостана.
                 </p>
                 <div class="place-footer">
-                    <div class="place-location">
+                    <a href="https://yandex.ru/maps/?text=Национальный музей Республики Башкортостан Уфа" class="place-location" target="_blank" rel="noopener noreferrer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                         Уфа
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -268,10 +469,10 @@
                     Иремель — вторая по высоте вершина Южного Урала (1582 м). Расположена на территории Башкортостана. Пользуется популярностью у туристов и альпинистов.
                 </p>
                 <div class="place-footer">
-                    <div class="place-location">
+                    <a href="https://yandex.ru/maps/?text=Гора Иремель Белорецкий район Башкортостан" class="place-location" target="_blank" rel="noopener noreferrer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                         Белорецкий район
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -285,10 +486,112 @@
                     Гостиный двор — памятник архитектуры конца XVIII века в Уфе. Это один из первых каменных архитектурных ансамблей города, выполненный в стиле классицизма.
                 </p>
                 <div class="place-footer">
-                    <div class="place-location">
+                    <a href="https://yandex.ru/maps/?text=Гостиный двор Уфа" class="place-location" target="_blank" rel="noopener noreferrer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                         Уфа
-                    </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Озеро Аслыкуль -->
+        <div class="place-card" data-category="nature">
+            <img src="{{ url_for('static', filename='images/aslikul.jpg') }}" alt="Озеро Аслыкуль" class="place-image">
+            <div class="place-content">
+                <h3 class="place-title">Озеро Аслыкуль</h3>
+                <p class="place-description">
+                    Самое большое озеро Башкортостана с площадью около 23,5 км². Расположено в Давлекановском районе и окружено живописными холмами. Популярное место отдыха и лечения.
+                </p>
+                <div class="place-footer">
+                    <a href="https://yandex.ru/maps/?text=Озеро Аслыкуль Давлекановский район Башкортостан" class="place-location" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Давлекановский район
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Мавзолей Хусейн-бека -->
+        <div class="place-card" data-category="historic">
+            <img src="{{ url_for('static', filename='images/husein_bek.jpg') }}" alt="Мавзолей Хусейн-бека" class="place-image">
+            <div class="place-content">
+                <h3 class="place-title">Мавзолей Хусейн-бека</h3>
+                <p class="place-description">
+                    Древнейший исламский памятник на территории России (XIV век). Расположен в Чишминском районе республики и является местом паломничества мусульман.
+                </p>
+                <div class="place-footer">
+                    <a href="https://yandex.ru/maps/?text=Мавзолей Хусейн-бека Чишминский район Башкортостан" class="place-location" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Чишминский район
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Красноусольские минеральные источники -->
+        <div class="place-card" data-category="nature">
+            <img src="{{ url_for('static', filename='images/krasnousolsk.jpg') }}" alt="Красноусольские минеральные источники" class="place-image">
+            <div class="place-content">
+                <h3 class="place-title">Красноусольские источники</h3>
+                <p class="place-description">
+                    Крупнейший бальнеологический курорт республики с минеральными источниками, обладающими лечебными свойствами. Находится в Гафурийском районе.
+                </p>
+                <div class="place-footer">
+                    <a href="https://yandex.ru/maps/?text=Красноусольские минеральные источники Гафурийский район" class="place-location" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Гафурийский район
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Дом-музей Шагита Худайбердина -->
+        <div class="place-card" data-category="culture">
+            <img src="{{ url_for('static', filename='images/hudayberdin.jpg') }}" alt="Дом-музей Шагита Худайбердина" class="place-image">
+            <div class="place-content">
+                <h3 class="place-title">Дом-музей Шагита Худайбердина</h3>
+                <p class="place-description">
+                    Мемориальный музей, посвященный видному башкирскому революционеру, государственному деятелю и писателю. Расположен в историческом центре Уфы.
+                </p>
+                <div class="place-footer">
+                    <a href="https://yandex.ru/maps/?text=Дом-музей Шагита Худайбердина Уфа" class="place-location" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Уфа
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Музей археологии и этнографии -->
+        <div class="place-card" data-category="culture">
+            <img src="{{ url_for('static', filename='images/archaeology_museum.jpg') }}" alt="Музей археологии и этнографии" class="place-image">
+            <div class="place-content">
+                <h3 class="place-title">Музей археологии и этнографии</h3>
+                <p class="place-description">
+                    Научно-исследовательский музей с богатейшей коллекцией археологических артефактов и этнографических экспонатов, отражающих культуру народов Южного Урала.
+                </p>
+                <div class="place-footer">
+                    <a href="https://yandex.ru/maps/?text=Музей археологии и этнографии Уфа" class="place-location" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Уфа
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Водопад Атыш -->
+        <div class="place-card" data-category="nature">
+            <img src="{{ url_for('static', filename='images/atysh.jpg') }}" alt="Водопад Атыш" class="place-image">
+            <div class="place-content">
+                <h3 class="place-title">Водопад Атыш</h3>
+                <p class="place-description">
+                    Уникальный карстовый источник-водопад, вытекающий из пещеры на высоте 4,5 м над уровнем реки. Расположен в Белорецком районе и является одним из самых живописных мест республики.
+                </p>
+                <div class="place-footer">
+                    <a href="https://yandex.ru/maps/?text=Водопад Атыш Белорецкий район Башкортостан" class="place-location" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#777"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        Белорецкий район
+                    </a>
                 </div>
             </div>
         </div>
@@ -297,6 +600,86 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Полная переработка подхода к загрузке изображений
+        function initLazyLoading() {
+            // Получаем все карточки
+            const placeCards = document.querySelectorAll('.place-card');
+            
+            // Обрабатываем каждую карточку
+            placeCards.forEach(card => {
+                // Получаем изображение внутри карточки
+                const img = card.querySelector('.place-image');
+                if (!img) return;
+                
+                // Сохраняем оригинальный src
+                const originalSrc = img.getAttribute('src');
+                img.removeAttribute('src'); // Удаляем src чтобы предотвратить автоматическую загрузку
+                img.setAttribute('data-src', originalSrc); // Сохраняем исходный путь
+                
+                // Создаем плейсхолдер с цветом категории
+                const category = card.getAttribute('data-category');
+                let placeholderColor = '#7f8c8d'; // Серый по умолчанию
+                
+                if (category === 'culture') {
+                    placeholderColor = '#8e44ad'; // Фиолетовый
+                } else if (category === 'nature') {
+                    placeholderColor = '#27ae60'; // Зеленый
+                } else if (category === 'historic') {
+                    placeholderColor = '#d35400'; // Оранжевый
+                }
+                
+                // Создаем анимированный плейсхолдер
+                const placeholderDiv = document.createElement('div');
+                placeholderDiv.className = 'image-placeholder';
+                placeholderDiv.style.backgroundColor = placeholderColor;
+                placeholderDiv.style.opacity = '0.2'; // Прозрачный фон
+                
+                // Добавляем анимацию пульсации
+                const pulseDiv = document.createElement('div');
+                pulseDiv.className = 'pulse-animation';
+                placeholderDiv.appendChild(pulseDiv);
+                
+                // Вставляем плейсхолдер перед изображением
+                img.parentNode.insertBefore(placeholderDiv, img);
+                
+                // Загружаем изображение в фоновом режиме
+                const tempImg = new Image();
+                tempImg.onload = function() {
+                    // Когда изображение загрузилось, устанавливаем src для основного изображения
+                    img.setAttribute('src', originalSrc);
+                    img.style.opacity = '1'; // Показываем изображение
+                    
+                    // Проверяем, чтобы контент был на месте
+                    const content = img.parentElement.querySelector('.place-content');
+                    if (content) {
+                        content.style.zIndex = '10'; // убеждаемся, что z-index установлен
+                    }
+                    
+                    // Скрываем плейсхолдер с задержкой для плавного перехода
+                    setTimeout(() => {
+                        placeholderDiv.style.opacity = '0';
+                        setTimeout(() => {
+                            placeholderDiv.remove();
+                        }, 500); // Удаляем плейсхолдер после анимации исчезновения
+                    }, 100);
+                };
+                
+                // Обработка ошибки загрузки
+                tempImg.onerror = function() {
+                    // Если изображение не загрузилось, показываем иконку ошибки
+                    placeholderDiv.innerHTML = '<div class="error-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="#ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>';
+                    placeholderDiv.style.opacity = '1';
+                    placeholderDiv.style.backgroundColor = '#e74c3c'; // Красный фон для ошибки
+                };
+                
+                // Начинаем загрузку
+                tempImg.src = originalSrc;
+            });
+        }
+        
+        // Вызываем функцию инициализации ленивой загрузки
+        initLazyLoading();
+        
         // Фильтрация карточек по категориям
         const categoryTabs = document.querySelectorAll('.category-tab');
         const placeCards = document.querySelectorAll('.place-card');
@@ -313,11 +696,22 @@
                 // Показываем/скрываем карточки в зависимости от выбранной категории
                 placeCards.forEach(card => {
                     if(category === 'all' || card.getAttribute('data-category') === category) {
-                        card.style.display = 'flex';
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            card.style.display = 'flex';
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                            }, 50);
+                        }, 300);
                     } else {
-                        card.style.display = 'none';
+                        card.style.opacity = '0';
+                        setTimeout(() => {
+                            card.style.display = 'none';
+                        }, 300);
                     }
                 });
+                
+
             });
         });
     });

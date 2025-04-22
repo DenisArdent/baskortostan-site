@@ -24,7 +24,7 @@
             <form action="{{ url_for('login') }}" method="post" novalidate>
                 {{ form.hidden_tag() }}
                 <div class="dark-form-group">
-                    {{ form.username(size=32, class="dark-form-control", placeholder="Почта") }}
+                    {{ form.email(size=32, class="dark-form-control", placeholder="Почта") }}
                 </div>
                 <div class="dark-form-group">
                     {{ form.password(size=32, class="dark-form-control", placeholder="Пароль") }}

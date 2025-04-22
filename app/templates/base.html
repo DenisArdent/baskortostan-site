@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome-animation.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/error-messages.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
     {% endblock %}
 </head>
 <body>
@@ -16,24 +18,15 @@
         {% include 'header.html' %}
 
         <main id="content">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <div class="flash-messages">
-                        {% for category, message in messages %}
-                            <div class="flash-message flash-{{ category }}">
-                                {{ message }}
-                                <span class="close-flash">&times;</span>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            {% endwith %}
             
             {% block content %}{% endblock %}
         </main>
 
         {% include 'footer.html' %}
     </div>
+    
+    <!-- Скрипт для анимации шапки при прокрутке -->
+    <script src="{{ url_for('static', filename='js/header-scroll.js') }}"></script>
     
     <!-- Модальное окно входа -->
     <div id="login-modal" class="dark-auth-overlay" style="display: none;">
@@ -59,7 +52,7 @@
                 <form id="login-form" action="{{ url_for('login') }}" method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="dark-form-group">
-                        <input type="text" name="username" class="dark-form-control" placeholder="Почта" required>
+                        <input type="email" name="email" class="dark-form-control" placeholder="Почта" required>
                     </div>
                     <div class="dark-form-group">
                         <input type="password" name="password" class="dark-form-control" placeholder="Пароль" required>
@@ -137,32 +130,59 @@
     <script>
         // Функция для показа формы входа
         function showLoginForm() {
-            console.log('showLoginForm called from inline script');
-            var loginModal = document.getElementById('login-modal');
-            var registerModal = document.getElementById('register-modal');
-            
-            if (registerModal) registerModal.style.display = 'none';
-            if (loginModal) {
-                loginModal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
-            
-            return false;
+            document.getElementById('login-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            setTimeout(function() {
+                document.getElementById('login-modal').style.opacity = '1';
+            }, 10);
+            // Применяем запрет скроллинга
+            disableScrollingAuthModals("login-modal");
         }
         
         // Функция для показа формы регистрации
         function showRegisterForm() {
-            console.log('showRegisterForm called from inline script');
-            var loginModal = document.getElementById('login-modal');
-            var registerModal = document.getElementById('register-modal');
+            document.getElementById('register-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            setTimeout(function() {
+                document.getElementById('register-modal').style.opacity = '1';
+            }, 10);
+            // Применяем запрет скроллинга
+            disableScrollingAuthModals("register-modal");
+        }
+        
+        // Функция для блокировки скроллинга в модальных окнах авторизации
+        function disableScrollingAuthModals(modalId) {
+            const modal = document.getElementById(modalId);
+            const modalContent = modal.querySelector('.dark-auth-container');
             
-            if (loginModal) loginModal.style.display = 'none';
-            if (registerModal) {
-                registerModal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
+            // Добавляем обработчики для предотвращения скроллинга
+            function preventScroll(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
             }
             
-            return false;
+            // Добавляем обработчики для всех элементов и их потомков
+            modal.addEventListener('wheel', preventScroll, { passive: false });
+            modal.addEventListener('touchmove', preventScroll, { passive: false });
+            modal.addEventListener('mousewheel', preventScroll, { passive: false });
+            modal.addEventListener('DOMMouseScroll', preventScroll, { passive: false });
+            
+            if (modalContent) {
+                modalContent.addEventListener('wheel', preventScroll, { passive: false });
+                modalContent.addEventListener('touchmove', preventScroll, { passive: false });
+                modalContent.addEventListener('mousewheel', preventScroll, { passive: false });
+                modalContent.addEventListener('DOMMouseScroll', preventScroll, { passive: false });
+                
+                // Применяем и ко всем дочерним элементам
+                const children = modalContent.querySelectorAll('*');
+                children.forEach(child => {
+                    child.addEventListener('wheel', preventScroll, { passive: false });
+                    child.addEventListener('touchmove', preventScroll, { passive: false });
+                    child.addEventListener('mousewheel', preventScroll, { passive: false });
+                    child.addEventListener('DOMMouseScroll', preventScroll, { passive: false });
+                });
+            }
         }
         
         // Функция для закрытия модального окна
@@ -176,6 +196,14 @@
         
         // Добавление обработчиков при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
+            // Инициализируем запрет на скроллинг в модальных окнах
+            if (document.getElementById('login-modal')) {
+                disableScrollingAuthModals('login-modal');
+            }
+            
+            if (document.getElementById('register-modal')) {
+                disableScrollingAuthModals('register-modal');
+            }
             // Обработчики для кнопок закрытия
             document.querySelectorAll('.close-modal').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
@@ -204,6 +232,7 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     <script src="{{ url_for('static', filename='js/menu.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/profile-menu.js') }}"></script>
     {% block scripts %}{% endblock %}
     <!-- Скрипт для навигации с помощью колёсика мыши -->
     <script src="{{ url_for('static', filename='js/scroll-navigation.js') }}"></script>
