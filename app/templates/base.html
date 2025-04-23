@@ -18,7 +18,6 @@
         {% include 'header.html' %}
 
         <main id="content">
-            
             {% block content %}{% endblock %}
         </main>
 
@@ -27,6 +26,34 @@
     
     <!-- Скрипт для анимации шапки при прокрутке -->
     <script src="{{ url_for('static', filename='js/header-scroll.js') }}"></script>
+    
+    <!-- Скрипт для обработки flash-сообщений в меню профиля -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Обработка клика на кнопку закрытия
+            let closeButtons = document.querySelectorAll('.close-flash');
+            closeButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    this.parentElement.style.opacity = '0';
+                    setTimeout(() => {
+                        this.parentElement.style.display = 'none';
+                    }, 300);
+                });
+            });
+            
+            // Автоматическое скрытие сообщений через 5 секунд
+            setTimeout(function() {
+                let flashMessages = document.querySelectorAll('.profile-notifications .flash-message');
+                flashMessages.forEach(function(message) {
+                    message.style.opacity = '0';
+                    message.style.transition = 'opacity 0.3s';
+                    setTimeout(() => {
+                        message.style.display = 'none';
+                    }, 300);
+                });
+            }, 5000);
+        });
+    </script>
     
     <!-- Модальное окно входа -->
     <div id="login-modal" class="dark-auth-overlay" style="display: none;">

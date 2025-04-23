@@ -14,7 +14,6 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(256))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
     
     def set_password(self, password):
         """Хеширование пароля"""
@@ -24,19 +23,41 @@ class User(UserMixin, db.Model):
         """Проверка пароля"""
         return check_password_hash(self.password_hash, password)
     
+    def has_admin_rights(self):
+        """Проверяет, является ли пользователь администратором любого уровня"""
+        admin = Admin.query.filter_by(user_id=self.id, is_active=True).first()
+        return admin is not None
+    
+    def is_admin(self):
+        """Проверяет, является ли пользователь администратором"""
+        admin = Admin.query.filter_by(user_id=self.id, is_active=True).first()
+        return admin is not None and admin.role == 'admin'
+    
+    def is_editor(self):
+        """Проверяет, является ли пользователь редактором"""
+        admin = Admin.query.filter_by(user_id=self.id, is_active=True).first()
+        return admin is not None and admin.role == 'editor'
+    
+    def get_admin_role(self):
+        """Возвращает роль администратора, если пользователь является администратором"""
+        admin = Admin.query.filter_by(user_id=self.id, is_active=True).first()
+        return admin.role if admin else None
+    
     def __repr__(self):
         return f'<User {self.username}>'
 
-# Пример другой модели
-class Post(db.Model):
-    """Модель записи/новости на сайте"""
+class Admin(db.Model):
+    """Модель администратора сайта"""
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(140))
-    content = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    role = db.Column(db.String(50))  # 'admin' or 'editor'
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # These fields are explicitly NOT included in the model:
+    # added_at, added_by, description - they should be removed from the database
+    
+    user = db.relationship('User', backref=db.backref('admin_role', uselist=False))
     
     def __repr__(self):
-        return f'<Post {self.title}>'
-
-# Здесь можно добавить дополнительные модели в зависимости от потребностей проекта
+        return f'<Admin {self.user.username}: {self.role}>'

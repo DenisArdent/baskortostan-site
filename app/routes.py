@@ -1,8 +1,9 @@
 from flask import render_template, request, jsonify, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
+from datetime import datetime
 from app import app, db
-from app.models import User
-from app.forms import LoginForm, RegistrationForm, ProfileForm
+from app.models import User, Admin
+from app.forms import LoginForm, RegistrationForm, ProfileForm, ContactForm, AuthenticatedContactForm
 
 # Навигационные элементы
 nav_items = [
@@ -90,33 +91,85 @@ def places():
                            attractions=attractions)
 
 
-@app.route('/contact', methods=['GET', 'POST'])  # Оба метода!
+# Добавим модель для сообщений обратной связи
+from datetime import datetime  # Добавим импорт здесь, чтобы быть уверенным
+
+class Feedback(db.Model):
+    """Модель для хранения сообщений обратной связи"""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(120))
+    topic = db.Column(db.String(50))
+    message = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Связь с пользователем, если был авторизован
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)  # Поле для отметки о прочтении
+    
+    user = db.relationship('User', backref=db.backref('feedback', lazy='dynamic'))
+    
+    def __repr__(self):
+        return f'<Feedback {self.topic}: {self.email}>'    
+
+@app.route('/contact', methods=['GET', 'POST'])
 def contact():
-    if request.method == 'POST':
+    # Инициализируем соответствующую форму в зависимости от авторизации
+    if current_user.is_authenticated:
+        form = AuthenticatedContactForm()
+    else:
+        form = ContactForm()
+    
+    # Обрабатываем отправку формы
+    if form.validate_on_submit():
         try:
-            data = request.get_json()
-            print("Получены данные:", data)  # Для отладки
-
-            if not data:
-                return jsonify({'error': 'No data received'}), 400
-
-            return jsonify({
-                'status': 'success',
-                'name': data.get('name'),
-                'email': data.get('email'),
-                'topic': data.get('topic')
-            }), 200
-
+            # Создаем новое сообщение обратной связи
+            feedback = Feedback()
+            feedback.topic = form.topic.data
+            feedback.message = form.message.data
+            
+            # Если пользователь авторизован, используем его данные
+            if current_user.is_authenticated:
+                feedback.name = current_user.username
+                feedback.email = current_user.email
+                feedback.user_id = current_user.id
+            else:
+                # Иначе берем из формы
+                feedback.name = form.name.data
+                feedback.email = form.email.data
+            
+            # Сохраняем в базу данных
+            db.session.add(feedback)
+            db.session.commit()
+            
+            # Отображаем сообщение об успехе
+            flash('Спасибо! Ваше сообщение отправлено. Мы свяжемся с вами в ближайшее время.', 'success')
+            
+            # Создаем новую пустую форму вместо перенаправления
+            if current_user.is_authenticated:
+                form = AuthenticatedContactForm()
+            else:
+                form = ContactForm()
+            
         except Exception as e:
-            print("Ошибка:", str(e))  # Логирование
-            return jsonify({'error': str(e)}), 500
+            db.session.rollback()
+            app.logger.error(f'Ошибка при сохранении формы обратной связи: {str(e)}')
+            flash('Произошла ошибка при отправке сообщения. Пожалуйста, попробуйте еще раз.', 'error')
 
-    # GET-запрос (возвращаем HTML)
+    # Добавляем контактную информацию
+    contact_info = {
+        'address': '450077, Республика Башкортостан, г. Уфа, ул. Тукаева, 46',
+        'phone': '+7 (347) 123-45-67',
+        'email': 'info@bashkortostan.ru',
+        'working_hours': 'Пн-Пт: 9:00-18:00, Обед: 13:00-14:00'
+    }
+    
     return render_template('contact.html',
-                           title='Контакты',
-                           current_page='Связаться с нами',
-                           active_page='contact',
-                           nav_items=nav_items)
+                          title='Контакты',
+                          current_page='Связаться с нами',
+                          active_page='contact',
+                          nav_items=nav_items,
+                          form=form,
+                          contact_info=contact_info,
+                          is_authenticated=current_user.is_authenticated)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -184,6 +237,9 @@ def register():
     
     # Если форма валидна и отправлена методом POST
     if form.validate_on_submit():
+        # Проверяем, есть ли уже пользователи в системе (является ли это первым пользователем)
+        is_first_user = User.query.count() == 0
+        
         # Создаем нового пользователя
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
@@ -191,6 +247,14 @@ def register():
         # Сохраняем пользователя в базе данных
         db.session.add(user)
         db.session.commit()
+        
+        # Если это первый пользователь, делаем его администратором
+        if is_first_user:
+            app.logger.info(f'Назначаем первого пользователя {user.username} администратором')
+            admin = Admin(user_id=user.id, role='admin', is_active=True)
+            db.session.add(admin)
+            db.session.commit()
+            app.logger.info('Первый пользователь успешно назначен администратором')
         
         # Автоматическая авторизация пользователя после регистрации
         login_user(user, remember=True)
@@ -223,32 +287,47 @@ def profile():
     form = ProfileForm(original_username=current_user.username)
     
     if form.validate_on_submit():
-        # Отслеживаем, было ли изменено имя пользователя
-        username_changed = False
-        if form.username.data != current_user.username:
-            current_user.username = form.username.data
-            username_changed = True
-            
-        # Отслеживаем, был ли изменен пароль
+        # Проверяем, были ли изменения в профиле
+        username_changed = form.username.data and form.username.data != current_user.username
         password_changed = False
-        if form.current_password.data and form.new_password.data and form.confirm_password.data:
-            # Проверяем, правильно ли введен текущий пароль
+        
+        # Применяем изменения к пользователю
+        if username_changed:
+            # Проверяем, что имя не занято
+            existing_user = User.query.filter_by(username=form.username.data).first()
+            if existing_user and existing_user.id != current_user.id:
+                flash('Это имя пользователя уже занято.', 'danger')
+                return redirect(url_for('profile'))
+            current_user.username = form.username.data
+        
+        # Почту не меняем, только используем для валидации
+        
+        # Если изменен пароль
+        if form.new_password.data:
+            # Проверка текущего пароля
             if not current_user.check_password(form.current_password.data):
-                flash('Неверный текущий пароль', 'error')
+                flash('Неверный текущий пароль.', 'danger')
                 return redirect(url_for('profile'))
             
-            # Обновляем пароль
+            # Проверяем, что новый пароль совпадает с подтверждением
+            if form.new_password.data != form.confirm_password.data:
+                flash('Пароли не совпадают.', 'danger')
+                return redirect(url_for('profile'))
+            
+            # Устанавливаем новый пароль
             current_user.set_password(form.new_password.data)
             password_changed = True
         
         # Сохраняем изменения
         db.session.commit()
         
-        # Показываем соответствующие уведомления
-        if password_changed:
-            flash('Пароль успешно изменен', 'success')
-        if username_changed:
-            flash('Данные профиля успешно обновлены', 'success')
+        # Показываем соответствующее сообщение в зависимости от того, что было изменено
+        if username_changed and password_changed:
+            flash('Имя пользователя и пароль успешно обновлены!', 'success')
+        elif password_changed:
+            flash('Пароль успешно изменен!', 'success')
+        elif username_changed:
+            flash('Имя пользователя успешно обновлено!', 'success')
         
         return redirect(url_for('profile'))
     elif request.method == 'GET':
@@ -258,6 +337,242 @@ def profile():
     return render_template('profile.html',
                           title='Профиль',
                           current_page='Профиль',
-                          active_page='profile',
                           form=form,
+                          is_admin=current_user.is_admin() if current_user.is_authenticated else False,
                           nav_items=nav_items)
+
+
+@app.route('/admin')
+@login_required
+def admin_panel():
+    """Admin panel main page"""
+    if not current_user.has_admin_rights():
+        flash('Доступ запрещен', 'danger')
+        return redirect(url_for('index'))
+        
+    return render_template('admin/index.html',
+                          title='Администрирование',
+                          current_page='Администрирование',
+                          nav_items=nav_items)
+
+
+@app.route('/admin/users', methods=['GET'])
+@login_required
+def admin_users():
+    """Admin panel user management"""
+    if not current_user.has_admin_rights():
+        flash('Доступ запрещен', 'danger')
+        return redirect(url_for('index'))
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    
+    # Получаем список пользователей с пагинацией, отсортированный по ID
+    users = User.query.order_by(User.id.asc()).paginate(
+        page=page, per_page=per_page, error_out=False)
+    
+    admin_users = {}
+    for user in users.items:
+        admin = None
+        if hasattr(user, 'admin_role') and user.admin_role and user.admin_role.is_active:
+            admin = user.admin_role
+        admin_users[user.id] = admin
+    
+    return render_template('admin/users.html',
+                          title='Управление пользователями',
+                          current_page='Управление пользователями',
+                          users=users.items,
+                          pagination=users,
+                          admin_users=admin_users,
+                          nav_items=nav_items)
+@app.route('/admin/appeals', methods=['GET'])
+@login_required
+def admin_appeals():
+    """Admin panel for viewing feedback messages"""
+    if not current_user.has_admin_rights():
+        flash('Доступ запрещен', 'danger')
+        return redirect(url_for('index'))
+    
+    # Получаем параметры из запроса
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    topic = request.args.get('topic', 'all')
+    search = request.args.get('search', '')
+    
+    # Базовый запрос
+    query = Feedback.query
+    
+    # Применяем фильтр по теме, если указан
+    if topic != 'all':
+        query = query.filter(Feedback.topic == topic)
+    
+    # Применяем поиск по тексту, если указан
+    if search:
+        search_term = f'%{search}%'
+        query = query.filter(
+            db.or_(
+                Feedback.name.ilike(search_term),
+                Feedback.email.ilike(search_term),
+                Feedback.message.ilike(search_term)
+            )
+        )
+    
+    # Получаем список обращений с пагинацией, отсортированный по дате (старые сверху)
+    appeals = query.order_by(Feedback.created_at.asc()).paginate(
+        page=page, per_page=per_page, error_out=False)
+    
+    # Помечаем все просматриваемые обращения как прочитанные
+    for appeal in appeals.items:
+        if not appeal.is_read:
+            appeal.is_read = True
+    
+    # Сохраняем изменения в базе данных
+    db.session.commit()
+    
+    # Создаем словарь с темами обращений для отображения
+    topic_labels = {
+        'question': 'Вопрос о регионе',
+        'feedback': 'Отзыв о посещении',
+        'cooperation': 'Предложение о сотрудничестве',
+        'error': 'Сообщение об ошибке на сайте',
+        'other': 'Другое'
+    }
+    
+    return render_template('admin/appeals.html',
+                          title='Обращения пользователей',
+                          current_page='Обращения',
+                          appeals=appeals.items,
+                          pagination=appeals,
+                          topic_labels=topic_labels,
+                          nav_items=nav_items)
+
+
+@app.route('/admin/reset_password', methods=['POST'])
+@login_required
+def reset_password():
+    """Сброс пароля пользователя администратором"""
+    # Проверяем, является ли текущий пользователь администратором
+    if not current_user.has_admin_rights():
+        return jsonify({'success': False, 'message': 'У вас нет прав администратора.'})    
+    
+    # Получаем параметры из запроса
+    user_id = request.form.get('user_id', type=int)
+    password = request.form.get('password')
+    
+    if not user_id:
+        flash('Неверный ID пользователя!', 'danger')
+        return redirect(url_for('admin_users'))
+    
+    # Проверяем пароль
+    if not password or len(password) < 6:
+        flash('Пароль должен содержать минимум 6 символов!', 'danger')
+        return redirect(url_for('admin_users'))
+    
+    # Находим пользователя
+    user = User.query.get(user_id)
+    if not user:
+        flash('Пользователь не найден!', 'danger')
+        return redirect(url_for('admin_users'))
+    
+    # Устанавливаем новый пароль
+    user.set_password(password)
+    db.session.commit()
+    
+    # Уведомляем об успехе
+    flash(f'Пароль пользователя {user.username} успешно изменен!', 'success')
+    return redirect(url_for('admin_users'))
+
+
+@app.route('/admin/user/update_field', methods=['POST'])
+@login_required
+def update_user_field():
+    """Обновление поля пользователя (AJAX)"""
+    # Проверяем, является ли текущий пользователь администратором
+    if not current_user.has_admin_rights():
+        return jsonify({'success': False, 'message': 'У вас нет прав администратора.'})
+    
+    # Получаем параметры из запроса
+    user_id = request.form.get('user_id', type=int)
+    field = request.form.get('field')
+    value = request.form.get('value')
+    
+    if not user_id or not field or not value:
+        return jsonify({'success': False, 'message': 'Недостаточно данных для запроса.'})
+    
+    # Находим пользователя
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'Пользователь не найден.'})
+    
+    # Обрабатываем запрос в зависимости от типа поля
+    if field == 'username':
+        existing_user = User.query.filter(User.username == value, User.id != user_id).first()
+        if existing_user:
+            return jsonify({'success': False, 'message': 'Это имя пользователя уже занято.'})
+        user.username = value
+    elif field == 'email':
+        existing_user = User.query.filter(User.email == value, User.id != user_id).first()
+        if existing_user:
+            return jsonify({'success': False, 'message': 'Этот email уже используется.'})
+        user.email = value
+    else:
+        return jsonify({'success': False, 'message': 'Неизвестное поле.'})
+    
+    # Сохраняем изменения
+    try:
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Данные обновлены успешно!'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Ошибка при обновлении данных: {str(e)}'})
+
+
+@app.route('/admin/set_role', methods=['POST'])
+@login_required
+def set_admin_role():
+    """Установка роли администратора для пользователя"""
+    # Проверяем, является ли текущий пользователь администратором
+    if not current_user.is_admin():
+        return jsonify({'success': False, 'message': 'Только администратор может управлять ролями.'})
+    
+    # Получаем параметры запроса
+    user_id = request.form.get('user_id', type=int)
+    role = request.form.get('role')  # 'admin', 'editor' или 'none'
+    
+    if not user_id or not role:
+        return jsonify({'success': False, 'message': 'Недостаточно данных для запроса.'})
+    
+    # Запрещаем снимать роль с самого себя
+    if user_id == current_user.id and role == 'none':
+        return jsonify({'success': False, 'message': 'Вы не можете снять роль администратора с самого себя.'})
+    
+    # Находим пользователя
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'Пользователь не найден.'})
+    
+    # Получаем текущую запись администратора для этого пользователя
+    from app.models import Admin
+    admin = Admin.query.filter_by(user_id=user.id).first()
+    
+    try:
+        if role == 'none':
+            # Удаляем роль администратора
+            if admin:
+                admin.is_active = False
+                db.session.commit()
+            return jsonify({'success': True, 'message': f'Роль администратора удалена у пользователя {user.username}!'})
+        else:
+            # Создаем или обновляем запись администратора
+            if not admin:
+                admin = Admin(user_id=user.id, role=role, is_active=True)
+                db.session.add(admin)
+            else:
+                admin.role = role
+                admin.is_active = True
+            
+            db.session.commit()
+            return jsonify({'success': True, 'message': f'Роль {role} успешно назначена пользователю {user.username}!'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Ошибка при изменении роли: {str(e)}'})

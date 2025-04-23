@@ -97,11 +97,12 @@ function handleScroll(event) {
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, не находимся ли мы на странице профиля
-    // Если URL содержит '/profile', не активируем навигацию скроллом
+    // Проверяем, не находимся ли мы на странице профиля или администрирования
+    // Если URL содержит '/profile' или '/admin', не активируем навигацию скроллом
     const isProfilePage = window.location.pathname.includes('/profile');
+    const isAdminPage = window.location.pathname.includes('/admin');
     
-    if (!isProfilePage) {
+    if (!isProfilePage && !isAdminPage) {
         // Добавляем обработчик события колёсика мыши
         window.addEventListener('wheel', handleScroll, { passive: false });
         

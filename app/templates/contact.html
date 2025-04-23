@@ -1,74 +1,310 @@
 {% extends "base.html" %}
 
+{% block styles %}
+    {{ super() }}
+    <style>
+        /* Стили для страницы "Связаться с нами" */
+        .culture-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .culture-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+            min-width: 180px;
+            overflow: hidden;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .culture-header h1:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: var(--blue);
+            margin: 5px auto 0;
+        }
+        
+        .culture-header .primary-lang {
+            display: inline-block;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .culture-header .secondary-lang {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            font-weight: bold;
+            color: var(--blue);
+        }
+        
+        .culture-header h1:hover .primary-lang {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        
+        .culture-header h1:hover .secondary-lang {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .culture-description {
+            font-size: 1.15rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Новые стили для формы обратной связи */
+        .contact-form-section {
+            position: relative;
+            background: linear-gradient(135deg, rgba(245,245,220,0.4) 0%, rgba(255,255,255,0.7) 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .contact-form-section::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0,87,184,0.1) 0%, rgba(0,87,184,0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        .contact-form-section::after {
+            content: '';
+            position: absolute;
+            bottom: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0,170,101,0.1) 0%, rgba(0,170,101,0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        .contact-form {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,87,184,0.1);
+            backdrop-filter: blur(5px);
+        }
+        
+        .form-group {
+            margin-bottom: 0.8rem;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--blue);
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            font-size: 1.1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(0, 87, 184, 0.1);
+            outline: none;
+        }
+        
+        .form-control::placeholder {
+            color: #aaa;
+            font-style: italic;
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, var(--blue) 0%, #004394 100%);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 87, 184, 0.2);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(0, 87, 184, 0.2);
+        }
+        
+        .submit-btn::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .5s, opacity 1s;
+        }
+        
+        .submit-btn:active::after {
+            transform: scale(0, 0);
+            opacity: .3;
+            transition: 0s;
+        }
+        
+        .user-info-block {
+            background: rgba(0, 87, 184, 0.05);
+            border-left: 5px solid var(--blue);
+            padding: 1.5rem;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .user-info-block p {
+            margin: 0.5rem 0;
+            color: #333;
+        }
+        
+        .user-info-block strong {
+            color: var(--blue);
+            font-weight: 600;
+        }
+        
+        /* Стили для flash-сообщений перенесены в notifications.css */
+        
+        /* Декоративные элементы */
+        .field-icon {
+            position: absolute;
+            right: 15px;
+            top: 44px;
+            color: var(--blue);
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus + .field-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-<section>
-    <h1>Связаться с нами</h1>
-    <p>Если у вас есть вопросы о Башкортостане, идеи для сотрудничества или вы хотите поделиться отзывом, мы будем рады услышать вас. Заполните форму ниже, и мы свяжемся с вами в ближайшее время.</p>
+<section style="max-width: 1000px; margin: 0 auto;">
+    <div class="culture-header">
+        <h1>
+            <span class="primary-lang">Связаться с нами</span>
+            <span class="secondary-lang">Беҙҙең менән бәйләнешкә инеү</span>
+        </h1>
+        <p class="culture-description">Башкортостан всегда рад посетителям и готов ответить на все вопросы. Если у вас есть предложения или идеи для сотрудничества, мы будем рады с вами связаться.</p>
+    </div>
 </section>
 
-<section>
-    <div class="ajax-response" id="ajaxResponse">
-        <!-- Сюда будет вставляться ответ от сервера -->
-    </div>
+<!-- Flash-сообщения выводятся в базовом шаблоне -->
 
-    <form id="contactForm" class="contact-form">
-        <div class="form-group">
-            <label for="name">Ваше имя:</label>
-            <input type="text" id="name" name="name" placeholder="Введите ваше имя" required>
+<section class="contact-form-section" style="padding: 2rem; max-width: 1000px; margin: 0 auto;">
+    {% if is_authenticated %}
+        <div class="user-info-block" style="width: calc(100% + 2rem); margin: 0 0 2rem -2rem; padding-left: 2rem;">
+            <p>Вы вошли как <strong>{{ current_user.username }}</strong></p>
+            <p>Ваша почта: {{ current_user.email }}</p>
         </div>
-
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" placeholder="example@mail.ru" required>
-        </div>
-
-        <div class="form-group">
-            <label for="topic">Тема обращения:</label>
-            <select id="topic" name="topic" required>
-                <option value="" disabled selected>Выберите тему</option>
-                <option value="question">Вопрос о регионе</option>
-                <option value="feedback">Отзыв о посещении</option>
-                <option value="cooperation">Предложение о сотрудничестве</option>
-                <option value="other">Другое</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="message">Сообщение:</label>
-            <textarea id="message" name="message" rows="5" placeholder="Введите ваше сообщение здесь..." required></textarea>
-        </div>
-
-        <button type="submit" class="submit-btn">Отправить сообщение</button>
+    {% endif %}
+    
+    <form method="POST" action="{{ url_for('contact') }}" class="contact-form" style="width: 95%; max-width: 900px; margin: 0 auto;">
+            {{ form.hidden_tag() }}
+            
+            {% if not is_authenticated %}
+            <!-- Поля для незарегистрированных пользователей -->
+            <div class="form-group">
+                {{ form.name.label }}
+                {{ form.name(class="form-control", placeholder="Имя и фамилия") }}
+                <i class="fas fa-user field-icon"></i>
+                {% for error in form.name.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Ваша почта</label>
+                {{ form.email(class="form-control", placeholder="example@yandex.ru") }}
+                <i class="fas fa-envelope field-icon"></i>
+                {% for error in form.email.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Общие поля для всех пользователей -->
+            <div class="form-group">
+                {{ form.topic.label }}
+                {{ form.topic(class="form-control") }}
+                <i class="fas fa-list-ul field-icon"></i>
+                {% for error in form.topic.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.message.label }}
+                {{ form.message(class="form-control", rows="6", placeholder="Расскажите, что вы хотели бы сообщить...") }}
+                <i class="fas fa-comment field-icon"></i>
+                {% for error in form.message.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="form-group" style="text-align: center;">
+                {{ form.submit(class="btn btn-primary submit-btn") }}
+            </div>
     </form>
 </section>
 
-<section>
-    <h2>Наши контакты</h2>
-    <div class="contact-info">
-        <div class="contact-item">
-            <div class="contact-text">
-                <h3>Адрес</h3>
-                <p>450077, Республика Башкортостан, г. Уфа, ул. Тукаева, 46</p>
-            </div>
-        </div>
-        
-        <div class="contact-item">
-            <div class="contact-text">
-                <h3>Телефон</h3>
-                <p>+7 (347) 123-45-67</p>
-            </div>
-        </div>
-        
-        <div class="contact-item">
-            <div class="contact-text">
-                <h3>Email</h3>
-                <p>info@bashkortostan.ru</p>
-            </div>
-        </div>
-    </div>
-</section>
-{% endblock %}
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/contact.js') }}"></script>
 {% endblock %}

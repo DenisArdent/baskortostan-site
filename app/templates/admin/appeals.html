@@ -1,0 +1,648 @@
+margin: 0 auto 1rem auto;{% extends "base.html" %}
+
+{% block content %}
+<!-- Скрытое поле с CSRF токеном для использования в AJAX запросах -->
+<input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
+<div class="admin-page">
+    <div class="container">
+        
+        <div class="admin-section">
+            <div class="admin-controls">
+                <form id="filterForm" action="{{ url_for('admin_appeals') }}" method="get">
+                    <input type="text" class="search-input" id="appealSearch" name="search" placeholder="Поиск в обращениях..." value="{{ request.args.get('search', '') }}">
+                    <div class="filter-controls">
+                        <select id="topicFilter" name="topic" class="filter-select">
+                            <option value="all" {% if request.args.get('topic') == 'all' or not request.args.get('topic') %}selected{% endif %}>Все темы</option>
+                            <option value="question" {% if request.args.get('topic') == 'question' %}selected{% endif %}>Вопрос о регионе</option>
+                            <option value="feedback" {% if request.args.get('topic') == 'feedback' %}selected{% endif %}>Отзыв о посещении</option>
+                            <option value="cooperation" {% if request.args.get('topic') == 'cooperation' %}selected{% endif %}>Сотрудничество</option>
+                            <option value="error" {% if request.args.get('topic') == 'error' %}selected{% endif %}>Ошибка на сайте</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="admin-table" id="appealsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Дата</th>
+                            <th>Имя</th>
+                            <th>Почта</th>
+                            <th>Тема</th>
+                            <th>Сообщение</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appeal in appeals %}
+                        <tr data-appeal-id="{{ appeal.id }}" data-topic="{{ appeal.topic }}">
+                            <td>{{ appeal.id }}</td>
+                            <td>{{ appeal.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td>{{ appeal.name }}</td>
+                            <td>{{ appeal.email }}</td>
+                            <td>
+                                {% if appeal.topic == 'question' %}
+                                    <span class="role-badge user">Вопрос о регионе</span>
+                                {% elif appeal.topic == 'feedback' %}
+                                    <span class="role-badge editor">Отзыв о посещении</span>
+                                {% elif appeal.topic == 'cooperation' %}
+                                    <span class="role-badge admin">Сотрудничество</span>
+                                {% elif appeal.topic == 'error' %}
+                                    <span class="role-badge" style="background-color: #ffecf0; color: #e53e3e; border-color: #feb2b2;">Ошибка на сайте</span>
+                                {% else %}
+                                    <span class="role-badge">Другое</span>
+                                {% endif %}
+                            </td>
+                            <td class="message-cell">
+                                <button class="btn-view-message" data-id="{{ appeal.id }}" data-name="{{ appeal.name }}" data-topic="{{ topic_labels.get(appeal.topic, appeal.topic) }}" data-message="{{ appeal.message|replace('\n', ' ')|truncate(1000, true) }}">
+                                    Просмотр
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Блок пагинации -->
+            {% if pagination.pages > 1 %}
+            <div class="pagination-container">
+                <div class="pagination">
+                    {% if pagination.has_prev %}
+                    <a href="{{ url_for('admin_appeals', page=pagination.prev_num, topic=request.args.get('topic', 'all'), search=request.args.get('search', '')) }}" class="pagination-item pagination-nav"><i class="pagination-arrow">❮</i></a>
+                    {% endif %}
+                    
+                    {% set start_page = [1, pagination.page - 2]|max %}
+                    {% set end_page = [start_page + 4, pagination.pages]|min %}
+                    {% set start_page = [end_page - 4, 1]|max %}
+                    
+                    {% if start_page > 1 %}
+                    <a href="{{ url_for('admin_appeals', page=1, topic=request.args.get('topic', 'all'), search=request.args.get('search', '')) }}" class="pagination-item">1</a>
+                    {% if start_page > 2 %}
+                    <span class="pagination-ellipsis">…</span>
+                    {% endif %}
+                    {% endif %}
+                    
+                    {% for page_num in range(start_page, end_page + 1) %}
+                    {% if page_num == pagination.page %}
+                    <span class="pagination-item pagination-active">{{ page_num }}</span>
+                    {% else %}
+                    <a href="{{ url_for('admin_appeals', page=page_num, topic=request.args.get('topic', 'all'), search=request.args.get('search', '')) }}" class="pagination-item">{{ page_num }}</a>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if end_page < pagination.pages %}
+                    {% if end_page < pagination.pages - 1 %}
+                    <span class="pagination-ellipsis">…</span>
+                    {% endif %}
+                    <a href="{{ url_for('admin_appeals', page=pagination.pages, topic=request.args.get('topic', 'all'), search=request.args.get('search', '')) }}" class="pagination-item">{{ pagination.pages }}</a>
+                    {% endif %}
+                    
+                    {% if pagination.has_next %}
+                    <a href="{{ url_for('admin_appeals', page=pagination.next_num, topic=request.args.get('topic', 'all'), search=request.args.get('search', '')) }}" class="pagination-item pagination-nav"><i class="pagination-arrow">❯</i></a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для просмотра сообщения -->
+<div id="messageModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('messageModal')">&times;</span>
+        <h2 class="modal-title">Тема: <span id="modalTopic" class="modal-topic-text"></span></h2>
+        <div class="modal-body">
+            <div class="message-content" id="messageContent" style="white-space: pre-wrap;"></div>
+        </div>
+        <div class="modal-actions">
+            <button onclick="closeModal('messageModal')" class="btn-close-modal">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-page {
+        padding: 0.5rem 0;
+    }
+    
+    .admin-section {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        margin: 0 auto 1rem auto;
+        max-width: 1000px;
+    }
+    
+    .admin-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 20px;
+    }
+    
+    .search-input {
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        width: 300px;
+        font-size: 15px;
+        background-color: #f8fafc;
+        color: #334155;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #bae6fd;
+        box-shadow: 0 0 0 3px rgba(186, 230, 253, 0.25);
+    }
+    
+    .search-input::placeholder {
+        color: #94a3b8;
+    }
+    
+    .filter-controls {
+        display: flex;
+        align-items: center;
+    }
+    
+    .filter-select {
+        padding: 10px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background-color: #f8fafc;
+        color: #334155;
+        font-size: 15px;
+        height: 45px;
+        min-width: 180px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+    }
+    
+    .filter-select:focus {
+        outline: none;
+        border-color: #bae6fd;
+        box-shadow: 0 0 0 3px rgba(186, 230, 253, 0.25);
+    }
+    
+    .filter-button {
+        margin-left: 10px;
+        padding: 10px 20px;
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .filter-button:hover {
+        background-color: #2563eb;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.12);
+    }
+    
+    #filterForm {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        align-items: center;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        max-width: 100%;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        margin-top: 16px;
+        background-color: white;
+    }
+    
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .admin-table thead th {
+        background-color: #f8fafc;
+        padding: 16px 20px;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        white-space: nowrap;
+    }
+    
+    .admin-table thead th:after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 25%;
+        height: 50%;
+        width: 1px;
+        background-color: #e2e8f0;
+    }
+    
+    .admin-table thead th:last-child:after {
+        display: none;
+    }
+    
+    .admin-table th:first-child {
+        border-top-left-radius: 8px;
+    }
+    
+    .admin-table th:last-child {
+        border-top-right-radius: 8px;
+    }
+    
+    .admin-table tbody td {
+        padding: 14px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.2s ease;
+        color: #334155;
+        font-size: 0.95rem;
+        vertical-align: middle;
+    }
+    
+    .admin-table tbody tr {
+        transition: all 0.3s ease;
+    }
+    
+    .admin-table tbody tr:hover {
+        background-color: rgba(243, 244, 246, 0.7);
+        transform: translateY(-1px);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    
+    .admin-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .admin-table tbody tr:nth-child(even) {
+        background-color: #fafbfc;
+    }
+    
+    .message-cell {
+        max-width: 300px;
+        position: relative;
+    }
+    
+    .message-preview {
+        font-size: 0.85rem;
+        color: #4a5568;
+        margin-bottom: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .btn-view-message {
+        display: inline-block;
+        background-color: #f8fafc;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+        padding: 6px 12px;
+        cursor: pointer;
+        box-shadow: none;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .btn-view-message:hover {
+        background-color: #f1f5f9;
+        border-color: #94a3b8;
+        transform: translateY(-1px);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .role-badge {
+        display: inline-block;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 9999px;
+        white-space: nowrap;
+        font-weight: 500;
+        border: 1px solid transparent;
+        background-color: #E2E8F0;
+        color: #4A5568;
+    }
+    
+    .role-badge.admin {
+        background-color: rgba(0, 87, 184, 0.1);
+        color: var(--blue);
+        border: 1px solid rgba(0, 87, 184, 0.2);
+    }
+    
+    .role-badge.editor {
+        background-color: rgba(56, 161, 105, 0.1);
+        color: #38A169;
+        border: 1px solid rgba(56, 161, 105, 0.2);
+    }
+    
+    .role-badge.user {
+        background-color: rgba(226, 232, 240, 0.5);
+        color: #475569;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    
+    /* Модальное окно */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal-content {
+        position: relative;
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        width: 80%;
+        max-width: 600px;
+        animation: modalFadeIn 0.3s;
+    }
+    
+    .close {
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .close:hover {
+        color: #000;
+    }
+    
+    .modal-title {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #2d3748;
+        font-size: 1.5rem;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 10px;
+    }
+    
+    .modal-body {
+        margin-bottom: 20px;
+    }
+    
+    .message-content {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        white-space: pre-wrap;
+        font-size: 1rem;
+        line-height: 1.6;
+        max-height: 400px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e9ecef;
+        color: #333;
+        letter-spacing: 0.3px;
+        word-wrap: break-word;
+        word-break: break-word;
+        border-top: 2px solid #e2e8f0;
+        margin-top: 15px;
+    }
+    
+    .modal-info {
+        margin-bottom: 15px;
+        color: #718096;
+        font-size: 0.95rem;
+        padding: 0 2px;
+    }
+    
+    .sender-info {
+        display: flex;
+        align-items: center;
+        padding: 5px 0;
+    }
+    
+    .modal-user-name {
+        color: #2D3748;
+        font-weight: 500;
+        margin-left: 5px;
+    }
+    
+    .modal-topic-text {
+        color: var(--blue);
+        font-weight: 600;
+    }
+    
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .btn-close-modal {
+        background-color: #e2e8f0;
+        color: #4a5568;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-close-modal:hover {
+        background-color: #cbd5e0;
+    }
+    
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Пагинация */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .pagination-item {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        padding: 0 12px;
+        text-align: center;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        background-color: transparent;
+        color: #475569;
+    }
+    
+    .pagination-item:hover {
+        background-color: rgba(224, 231, 255, 0.2);
+        color: #334155;
+    }
+    
+    .pagination-active {
+        background-color: #3b82f6;
+        color: white;
+        font-weight: 600;
+        box-shadow: none;
+    }
+    
+    /* Навигационные кнопки используют базовый стиль pagination-item */
+    
+    .pagination-ellipsis {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    .pagination-arrow {
+        font-style: normal;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    
+    /* Адаптивность на маленьких экранах */
+    @media (max-width: 768px) {
+        .admin-table {
+            font-size: 0.8rem;
+        }
+        
+        .admin-table th,
+        .admin-table td {
+            padding: 8px;
+        }
+        
+        .search-input {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<script>
+    // Поиск по таблице
+    document.getElementById('appealSearch').addEventListener('input', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#appealsTable tbody tr');
+        
+        rows.forEach(row => {
+            let found = false;
+            const cells = row.getElementsByTagName('td');
+            
+            for (let i = 0; i < cells.length; i++) {
+                const cellText = cells[i].textContent.toLowerCase();
+                if (cellText.includes(searchValue)) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            row.style.display = found ? '' : 'none';
+        });
+    });
+    
+    // Отображение модального окна с полным текстом сообщения
+    document.addEventListener('DOMContentLoaded', function() {
+        // Добавляем обработчики событий для всех кнопок просмотра
+        document.querySelectorAll('.btn-view-message').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var appealId = this.getAttribute('data-id');
+                var name = this.getAttribute('data-name');
+                var topic = this.getAttribute('data-topic');
+                var message = this.getAttribute('data-message');
+                
+                document.getElementById('modalTopic').textContent = topic;
+                document.getElementById('messageContent').textContent = message;
+                document.getElementById('messageModal').style.display = 'block';
+            });
+        });
+        
+        // Автоматическая отправка формы при изменении селекта
+        const topicFilter = document.getElementById('topicFilter');
+        const searchInput = document.getElementById('appealSearch');
+        const filterForm = document.getElementById('filterForm');
+        
+        // Автоматическая отправка при изменении выпадающего списка
+        topicFilter.addEventListener('change', function() {
+            filterForm.submit();
+        });
+        
+        // Функция для быстрого поиска при вводе
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                if (searchInput.value.length >= 3 || searchInput.value.length === 0) {
+                    filterForm.submit();
+                }
+            }, 500);
+        });
+    });
+    
+    // Закрытие модального окна
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+    
+    // Закрытие модального окна при клике вне его
+    window.addEventListener('click', function(event) {
+        const modals = document.getElementsByClassName('modal');
+        for (let modal of modals) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, Optional
 from app.models import User
 
@@ -77,3 +77,37 @@ class ProfileForm(FlaskForm):
             user = User.query.filter_by(username=username.data).first()
             if user is not None:
                 raise ValidationError('Это имя уже занято. Попробуйте выбрать другое.')
+
+
+class ContactForm(FlaskForm):
+    """Форма обратной связи для незарегистрированных пользователей"""
+    name = StringField('Ваше имя', validators=[DataRequired(message='Пожалуйста, введите ваше имя')])
+    email = StringField('Email', validators=[DataRequired(), Email(message='Пожалуйста, введите корректный email')])
+    topic = SelectField('Тема обращения', validators=[DataRequired()], 
+                      choices=[
+                          ('', 'Выберите тему'),
+                          ('question', 'Вопрос о регионе'),
+                          ('feedback', 'Отзыв о посещении'),
+                          ('cooperation', 'Предложение о сотрудничестве'),
+                          ('error', 'Сообщить об ошибке на сайте'),
+                          ('other', 'Другое')
+                      ])
+    message = TextAreaField('Сообщение', validators=[DataRequired(message='Пожалуйста, введите текст сообщения'),
+                                                   Length(min=10, message='Сообщение должно содержать минимум 10 символов')])
+    submit = SubmitField('Отправить сообщение')
+
+
+class AuthenticatedContactForm(FlaskForm):
+    """Форма обратной связи для зарегистрированных пользователей (без полей имени и email)"""
+    topic = SelectField('Тема обращения', validators=[DataRequired()], 
+                      choices=[
+                          ('', 'Выберите тему'),
+                          ('question', 'Вопрос о регионе'),
+                          ('feedback', 'Отзыв о посещении'),
+                          ('cooperation', 'Предложение о сотрудничестве'),
+                          ('error', 'Сообщить об ошибке на сайте'),
+                          ('other', 'Другое')
+                      ])
+    message = TextAreaField('Сообщение', validators=[DataRequired(message='Пожалуйста, введите текст сообщения'),
+                                                   Length(min=10, message='Сообщение должно содержать минимум 10 символов')])
+    submit = SubmitField('Отправить сообщение')
