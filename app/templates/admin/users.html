@@ -1,0 +1,1142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Скрытое поле с CSRF токеном для использования в AJAX запросах -->
+<input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
+<div class="admin-page">
+    <!-- Убран скрытый элемент для флага -->
+    <div class="container">
+        
+        <div class="admin-section">
+            <div class="admin-controls">
+                <input type="text" class="search-input" id="userSearch" placeholder="Поиск пользователей...">
+            </div>
+
+            <div class="table-responsive">
+                <table class="admin-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя пользователя</th>
+                            <th>Почта</th>
+                            <th>Пароль</th>
+                            <th>Дата регистрации</th>
+                            <th>Роль</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr data-user-id="{{ user.id }}">
+                            <td>{{ user.id }}</td>
+                            <td class="username-cell editable" data-field="username" data-user-id="{{ user.id }}">{{ user.username }}</td>
+                            <td class="email-cell editable" data-field="email" data-user-id="{{ user.id }}">{{ user.email }}</td>
+                            <td class="password-cell" data-user-id="{{ user.id }}">
+                                {% if current_user.id != user.id %}
+                                <button class="btn-password" onclick="showPasswordModal('{{ user.id }}', '{{ user.username }}')" title="Изменить пароль">
+                                    Изменить
+                                </button>
+                                {% else %}
+                                <span class="password-self">Ваш аккаунт</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.created_at.strftime('%d.%m.%Y') if user.created_at else 'Нет данных' }}</td>
+                            <td class="role-cell{% if current_user.id != user.id %} role-editable{% endif %}" data-user-id="{{ user.id }}" {% if current_user.id != user.id %}data-editable="role"{% endif %}>
+                                {% if user.has_admin_rights() %}
+                                    {% set admin_role = user.get_admin_role() %}
+                                    {% if admin_role == 'admin' %}
+                                        <span class="role-badge admin">Администратор</span>
+                                    {% elif admin_role == 'editor' %}
+                                        <span class="role-badge editor">Редактор</span>
+                                    {% else %}
+                                        <span class="role-badge user">Пользователь</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="role-badge user">Пользователь</span>
+                                {% endif %}
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Блок пагинации -->
+            {% if pagination and pagination.pages > 1 %}
+            <div class="pagination-container">
+                <div class="pagination">
+                    {% if pagination.has_prev %}
+                    <a href="{{ url_for('admin_users', page=pagination.prev_num) }}" class="pagination-item pagination-nav"><i class="pagination-arrow">❮</i></a>
+                    {% endif %}
+                    
+                    {% set start_page = [1, pagination.page - 2]|max %}
+                    {% set end_page = [start_page + 4, pagination.pages]|min %}
+                    {% set start_page = [end_page - 4, 1]|max %}
+                    
+                    {% if start_page > 1 %}
+                    <a href="{{ url_for('admin_users', page=1) }}" class="pagination-item">1</a>
+                    {% if start_page > 2 %}
+                    <span class="pagination-ellipsis">...</span>
+                    {% endif %}
+                    {% endif %}
+                    
+                    {% for page_num in range(start_page, end_page + 1) %}
+                    {% if page_num == pagination.page %}
+                    <span class="pagination-item pagination-active">{{ page_num }}</span>
+                    {% else %}
+                    <a href="{{ url_for('admin_users', page=page_num) }}" class="pagination-item">{{ page_num }}</a>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if end_page < pagination.pages %}
+                    {% if end_page < pagination.pages - 1 %}
+                    <span class="pagination-ellipsis">...</span>
+                    {% endif %}
+                    <a href="{{ url_for('admin_users', page=pagination.pages) }}" class="pagination-item">{{ pagination.pages }}</a>
+                    {% endif %}
+                    
+                    {% if pagination.has_next %}
+                    <a href="{{ url_for('admin_users', page=pagination.next_num) }}" class="pagination-item pagination-nav"><i class="pagination-arrow">❯</i></a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно изменения роли -->
+<div id="roleUserModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('roleUserModal')">&times;</span>
+        <h2>Изменить роль пользователя</h2>
+        <div id="roleUserName" class="user-info-text"></div>
+        
+        <form id="roleUserForm" action="{{ url_for('set_admin_role') }}" method="POST">
+            <input type="hidden" id="roleUserId" name="user_id" value="">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="form-group role-options">
+                <div class="role-option">
+                    <input type="radio" id="roleUser" name="role" value="none">
+                    <label for="roleUser">Пользователь</label>
+                </div>
+                
+                <div class="role-option">
+                    <input type="radio" id="roleEditor" name="role" value="editor">
+                    <label for="roleEditor">Редактор</label>
+                </div>
+                
+                <div class="role-option">
+                    <input type="radio" id="roleAdmin" name="role" value="admin">
+                    <label for="roleAdmin">Администратор</label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Сохранить</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('roleUserModal')">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .admin-page {
+        padding: 2rem 0;
+    }
+    
+    .admin-section {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        margin: 0 auto 0rem auto;
+        max-width: 1000px;
+    }
+    
+    .admin-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 20px;
+    }
+    
+    .search-input {
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        width: 300px;
+        font-size: 15px;
+        background-color: #f8fafc;
+        color: #334155;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #bae6fd;
+        box-shadow: 0 0 0 3px rgba(186, 230, 253, 0.25);
+    }
+    
+    .search-input::placeholder {
+        color: #94a3b8;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        max-width: 100%;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        margin-top: 16px;
+        background-color: white;
+    }
+    
+    .admin-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .admin-table thead th {
+        background-color: #f8fafc;
+        padding: 16px 20px;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+    }
+    
+    .admin-table thead th:after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 25%;
+        height: 50%;
+        width: 1px;
+        background-color: #e2e8f0;
+    }
+    
+    .admin-table thead th:last-child:after {
+        display: none;
+    }
+    
+    .admin-table th:last-child {
+        border-top-right-radius: 8px;
+    }
+    
+    .admin-table tbody td {
+        padding: 14px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.2s ease;
+        color: #334155;
+        font-size: 0.95rem;
+        vertical-align: middle;
+    }
+    
+    .admin-table tbody tr {
+        transition: all 0.3s ease;
+    }
+    
+    .admin-table tbody tr:hover {
+        background-color: rgba(243, 244, 246, 0.7);
+        transform: translateY(-1px);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    
+    .admin-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .admin-table tbody tr:nth-child(even) {
+        background-color: #fafbfc;
+    }
+    
+    .admin-table tr {
+        cursor: pointer;
+    }
+    
+    .role-editable {
+        position: relative;
+    }
+    
+    .role-editable:hover {
+        cursor: pointer;
+    }
+    
+    /* Стили для улучшенного выпадающего меню */
+    .role-select {
+        background-color: white;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+        width: 240px;
+        z-index: 1000;
+        animation: fadeInScale 0.2s ease forwards;
+        transform-origin: top left;
+        outline: none;
+    }
+    
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    .role-option {
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+    
+    .role-option:not(:last-child) {
+        border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .role-option:hover {
+        background-color: #f8fafc;
+    }
+    
+    .role-option:hover .role-badge {
+        transform: translateX(5px);
+    }
+    
+    .role-option.current-role {
+        background-color: #f1f5f9;
+    }
+    
+    .role-option.current-role::before {
+        content: '✓';
+        position: absolute;
+        right: 15px;
+        color: #3b82f6;
+        font-weight: bold;
+    }
+    
+    .role-option .role-badge {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 8px 12px;
+        transition: all 0.2s ease;
+    }
+    
+    .role-select::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 20px;
+        width: 12px;
+        height: 12px;
+        background-color: white;
+        transform: rotate(45deg);
+        border-left: 1px solid #e2e8f0;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .actions-cell {
+        white-space: nowrap;
+        text-align: center;
+    }
+    
+    .btn-edit, .btn-role, .btn-password {
+        background-color: transparent;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .btn-password:hover {
+        background-color: #f1f5f9;
+        border-color: #94a3b8;
+        transform: translateY(-1px);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .password-self {
+        color: #64748b;
+        font-style: italic;
+        padding: 6px 12px;
+        border-radius: 6px;
+        background-color: #f8fafc;
+        display: inline-block;
+        border: 1px dashed #cbd5e1;
+        font-size: 0.9rem;
+    }
+    
+    .password-icon {
+        margin-right: 8px;
+        font-style: normal;
+        font-size: 0.9rem;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .role-badge.admin {
+        background-color: rgba(254, 202, 202, 0.4);
+        color: #be123c;
+        border: 1px solid rgba(254, 202, 202, 0.8);
+    }
+    
+    .role-badge.editor {
+        background-color: rgba(191, 219, 254, 0.4);
+        color: #0369a1;
+        border: 1px solid rgba(191, 219, 254, 0.8);
+    }
+    
+    .role-badge.user {
+        background-color: rgba(226, 232, 240, 0.5);
+        color: #475569;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    
+    /* Стили для пагинации */
+    .pagination-container {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 10px 0;
+    }
+    
+    .pagination {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        gap: 8px;
+    }
+    
+    .pagination-item {
+        text-decoration: none;
+        padding: 8px 14px;
+        border-radius: 8px;
+        color: #4a5568;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+    }
+    
+    .pagination-item:hover {
+        background-color: #edf2f7;
+        color: #2d3748;
+        transform: translateY(-1px);
+    }
+    
+    .pagination-active {
+        background-color: #3b82f6;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Навигационные кнопки используют тот же стиль, что и обычные кнопки пагинации */
+    
+    /* Все элементы пагинации используют общий эффект при наведении */
+    
+    .pagination-ellipsis {
+        color: #a0aec0;
+        padding: 0 8px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+    
+    .pagination-arrow {
+        font-style: normal;
+        font-weight: bold;
+        font-size: 18px;
+    }
+    
+    /* Модальные окна */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .modal-content {
+        background-color: #FFFFFF;
+        margin: 7% auto;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .modal h2 {
+        margin-top: 0;
+        color: #1e293b;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e2e8f0;
+        font-weight: 600;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .close-modal {
+        position: absolute;
+        right: 18px;
+        top: 18px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #a0aec0;
+        transition: color 0.2s, transform 0.2s;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        z-index: 10;
+    }
+    
+    .close-modal:hover {
+        color: #4a5568;
+        transform: rotate(90deg);
+        background-color: #f7fafc;
+    }
+    
+    /* Password modal specific styles */
+    .password-modal-content {
+        max-width: 500px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .modal-header-section {
+        margin-bottom: 24px;
+    }
+    
+    .modal-title {
+        margin-bottom: 15px;
+        color: #2d3748;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    
+    .password-guidelines {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 15px;
+        background-color: #EBF8FF;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #2c5282;
+        border-left: 4px solid #3182CE;
+    }
+    
+    .security-icon {
+        color: #2B6CB0;
+        font-size: 16px;
+    }
+    
+    .password-field {
+        position: relative;
+    }
+    
+    .password-input {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 14px 16px;
+        transition: all 0.3s ease;
+        background-color: #f8fafc;
+    }
+    
+    .password-input:focus {
+        border-color: #3182CE;
+        box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+        background-color: white;
+    }
+    
+    .secure-form {
+        padding: 5px 0;
+    }
+    
+    .btn-save-password {
+        background-color: #3182CE;
+        padding: 12px 20px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+    
+    .btn-save-password:hover {
+        background-color: #2B6CB0;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(43, 108, 176, 0.25);
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+    
+    .password-field label {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #90cdf4;
+        box-shadow: 0 0 0 3px rgba(144, 205, 244, 0.2);
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 25px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 20px;
+    }
+    
+    .btn-primary {
+        background-color: #3b82f6;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 87, 184, 0.25);
+    }
+    
+    .btn-secondary {
+        background-color: #f1f5f9;
+        color: #475569;
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        letter-spacing: 0.3px;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #cbd5e0;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .role-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    
+    .role-option {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .user-info-text {
+        margin-bottom: 20px;
+        color: #475569;
+        padding: 12px 15px;
+        background-color: #f8fafc;
+        border-radius: 6px;
+        border-left: 3px solid #3b82f6;
+        font-size: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Поиск по таблице
+    document.getElementById('userSearch').addEventListener('input', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#usersTable tbody tr');
+        
+        rows.forEach(row => {
+            const username = row.querySelector('.username-cell').textContent.toLowerCase();
+            const email = row.querySelector('.email-cell').textContent.toLowerCase();
+            
+            if (username.includes(searchValue) || email.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // Инициализация редактируемых ячеек
+    document.addEventListener('DOMContentLoaded', function() {
+        // Убрали отображение стартовой подсказки
+    
+        // Редактирование имени пользователя и email
+        const editableCells = document.querySelectorAll('.editable');
+        editableCells.forEach(cell => {
+            cell.addEventListener('click', function() {
+                // Проверяем, что ячейка еще не в режиме редактирования
+                if (!this.classList.contains('editing')) {
+                    const currentValue = this.textContent.trim();
+                    const userId = this.getAttribute('data-user-id');
+                    const field = this.getAttribute('data-field');
+                    
+                    this.classList.add('editing');
+                    this.innerHTML = `<input type="text" value="${currentValue}" data-original="${currentValue}">`;
+                    
+                    const input = this.querySelector('input');
+                    input.focus();
+                    
+                    // Обработка потери фокуса
+                    input.addEventListener('blur', function() {
+                        finishEditing(cell, userId, field, this.value, this.getAttribute('data-original'));
+                    });
+                    
+                    // Обработка нажатия Enter
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            finishEditing(cell, userId, field, this.value, this.getAttribute('data-original'));
+                        } else if (e.key === 'Escape') {
+                            // Отмена редактирования при нажатии Escape
+                            cell.classList.remove('editing');
+                            cell.textContent = this.getAttribute('data-original');
+                        }
+                    });
+                }
+            });
+        });
+        
+        // Редактирование роли пользователя
+        const roleCells = document.querySelectorAll('.role-editable');
+        roleCells.forEach(cell => {
+            cell.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Закрыть любые уже открытые меню
+                const existingMenu = document.querySelector('.role-select');
+                if (existingMenu) {
+                    document.body.removeChild(existingMenu);
+                }
+                
+                const userId = this.getAttribute('data-user-id');
+                const rect = this.getBoundingClientRect();
+                const badge = this.querySelector('.role-badge');
+                const currentRole = badge ? badge.className.split(' ')[1] : 'user';
+                
+                // Определяем лучшую позицию для меню
+                const windowHeight = window.innerHeight;
+                const spaceBelow = windowHeight - rect.bottom;
+                const docScrollY = window.scrollY;
+                
+                // Создаем выпадающий список
+                const roleSelect = document.createElement('div');
+                roleSelect.classList.add('role-select');
+                roleSelect.style.position = 'absolute';
+                
+                // Позиционируем меню и контролируем, чтобы оно не выходило за пределы экрана
+                roleSelect.style.top = (docScrollY + rect.bottom + 10) + 'px';
+                // Выравниваем по левому краю ячейки
+                roleSelect.style.left = (window.scrollX + rect.left) + 'px';
+                
+                // Добавляем варианты ролей
+                const roles = [
+                    { value: 'admin', label: 'Администратор', class: 'admin' },
+                    { value: 'editor', label: 'Редактор', class: 'editor' },
+                    { value: 'none', label: 'Пользователь', class: 'user' }
+                ];
+                
+                roles.forEach(role => {
+                    const option = document.createElement('div');
+                    option.classList.add('role-option');
+                    
+                    // Выделяем текущую роль
+                    if (role.class === currentRole) {
+                        option.classList.add('current-role');
+                    }
+                    
+                    option.innerHTML = `<span class="role-badge ${role.class}">${role.label}</span>`;
+                    
+                    // Плавное закрытие
+                    option.addEventListener('click', function() {
+                        roleSelect.style.opacity = '0';
+                        roleSelect.style.transform = 'scale(0.95)';
+                        
+                        setTimeout(() => {
+                            updateUserRole(userId, role.value, cell);
+                            if (document.body.contains(roleSelect)) {
+                                document.body.removeChild(roleSelect);
+                            }
+                        }, 150);
+                    });
+                    
+                    roleSelect.appendChild(option);
+                });
+                
+                // Добавляем выпадающий список в документ
+                document.body.appendChild(roleSelect);
+                
+                // Устанавливаем фокус на меню, чтобы оно могло получать события клавиатуры
+                roleSelect.tabIndex = -1;
+                roleSelect.focus();
+                
+                // Обработка клавиш (ESC для закрытия)
+                roleSelect.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        if (document.body.contains(roleSelect)) {
+                            document.body.removeChild(roleSelect);
+                        }
+                    }
+                });
+                
+                // Закрываем выпадающий список при клике вне его
+                document.addEventListener('click', function closeRoleSelect(e) {
+                    if (!roleSelect.contains(e.target) && e.target !== cell) {
+                        if (document.body.contains(roleSelect)) {
+                            roleSelect.style.opacity = '0';
+                            roleSelect.style.transform = 'scale(0.95)';
+                            
+                            setTimeout(() => {
+                                if (document.body.contains(roleSelect)) {
+                                    document.body.removeChild(roleSelect);
+                                }
+                            }, 150);
+                        }
+                        document.removeEventListener('click', closeRoleSelect);
+                    }
+                });
+            });
+        });
+    });
+    
+    // Функция завершения редактирования
+    function finishEditing(cell, userId, field, newValue, originalValue) {
+        cell.classList.remove('editing');
+        
+        if (newValue.trim() === '') {
+            // Не позволяем пустые значения
+            cell.textContent = originalValue;
+            return;
+        }
+        
+        if (newValue !== originalValue) {
+            // Получаем CSRF токен
+            const csrfToken = document.getElementById('csrf_token').value;
+            
+            // Отправляем запрос на сервер для обновления данных
+            fetch('/admin/user/update_field', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `user_id=${userId}&field=${field}&value=${encodeURIComponent(newValue)}&csrf_token=${csrfToken}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    cell.textContent = newValue;
+                    showNotification(`Поле ${field === 'username' ? 'имени пользователя' : 'почты'} успешно обновлено`, 'success');
+                } else {
+                    showNotification(data.error || 'Ошибка при обновлении', 'error');
+                    cell.textContent = originalValue;
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                cell.textContent = originalValue;
+            });
+        } else {
+            cell.textContent = originalValue;
+        }
+    }
+    
+    // Функция обновления роли пользователя
+    function updateUserRole(userId, role) {
+        // Получаем CSRF-токен
+        const token = document.getElementById('csrf_token').value;
+        
+        // Отправляем AJAX-запрос
+        fetch('/admin/set_role', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': token
+            },
+            body: `user_id=${userId}&role=${role}&csrf_token=${token}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Обновляем отображение роли в ячейке таблицы
+                const cell = document.querySelector(`.role-cell[data-user-id="${userId}"]`);
+                let newRoleHTML = '';
+                
+                if (role === 'none') {
+                    newRoleHTML = '<span class="role-badge user">Пользователь</span>';
+                } else if (role === 'editor') {
+                    newRoleHTML = '<span class="role-badge editor">Редактор</span>';
+                } else if (role === 'admin') {
+                    newRoleHTML = '<span class="role-badge admin">Администратор</span>';
+                }
+                
+                if (cell) {
+                    cell.innerHTML = newRoleHTML;
+                }
+                
+                // Закрываем модальное окно
+                closeModal('roleUserModal');
+                
+                // Показываем уведомление об успехе
+                showNotification('Роль пользователя успешно изменена', 'success');
+            } else {
+                // Показываем ошибку
+                showNotification(data.error || 'Произошла ошибка при изменении роли', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Произошла ошибка при обработке запроса', 'error');
+        });
+    }
+    
+    function confirmDeleteUser(userId, username) {
+        if (confirm(`Вы действительно хотите удалить пользователя "${username}"? Это действие нельзя отменить.`)) {
+            window.location.href = '/admin/delete_user/' + userId;
+        }
+    }
+    
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+    
+    // Функция для показа модального окна смены пароля
+    function showPasswordModal(userId, username) {
+        // Создаем модальное окно, если его еще нет
+        let modal = document.getElementById('passwordModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'passwordModal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content password-modal-content">
+                    <span class="close-modal" onclick="closeModal('passwordModal')">&times;</span>
+                    <div class="modal-header-section">
+                        <h2 class="modal-title">Изменение пароля</h2>
+                    </div>
+                    <form id="passwordForm" method="POST" class="secure-form" action="/admin/reset_password">
+                        <input type="hidden" name="csrf_token" id="password_csrf_token">
+                        <input type="hidden" name="user_id" id="password_user_id">
+
+                        <div class="form-group password-field">
+                            <label for="newPassword">Новый пароль</label>
+                            <input type="password" id="newPassword" name="password" class="form-control password-input" minlength="6" placeholder="Не менее 6 символов" required>
+                        </div>
+                        <div class="form-group password-field">
+                            <label for="confirmPassword">Подтвердите пароль</label>
+                            <input type="password" id="confirmPassword" name="confirm_password" class="form-control password-input" placeholder="Повторите новый пароль" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="closeModal('passwordModal')">Отмена</button>
+                            <button type="submit" class="btn-primary btn-save-password">Сохранить пароль</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // Устанавливаем ID пользователя в скрытом поле
+        document.getElementById('password_user_id').value = userId;
+        // Устанавливаем CSRF токен из скрытого поля
+        document.getElementById('password_csrf_token').value = document.getElementById('csrf_token').value;
+        
+        // Добавляем валидацию паролей
+        const passwordForm = document.getElementById('passwordForm');
+        passwordForm.addEventListener('submit', function(e) {
+            const password = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Пароли не совпадают');
+                return false;
+            }
+            
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('Пароль должен содержать минимум 6 символов');
+                return false;
+            }
+        });
+        
+        // Показываем модальное окно
+        modal.style.display = 'block';
+    }
+    
+    // Функция для показа всплывающих уведомлений
+    function showNotification(message, type = 'success', duration = 3000) {
+        // Получаем контейнер уведомлений из выпадающего меню профиля
+        let container = document.querySelector('.profile-dropdown .profile-notifications');
+        
+        // Если контейнер не найден, создаем его
+        if (!container) {
+            const profileDropdown = document.querySelector('.profile-dropdown');
+            if (profileDropdown) {
+                container = document.createElement('div');
+                container.className = 'profile-notifications';
+                profileDropdown.appendChild(container);
+            } else {
+                console.error('Не найден контейнер профиля для отображения уведомлений');
+                return;
+            }
+        }
+        
+        // Проверяем, есть ли уже такое же уведомление в контейнере
+        const existingNotifications = container.querySelectorAll('.flash-message');
+        for (let i = 0; i < existingNotifications.length; i++) {
+            const notificationText = existingNotifications[i].querySelector('span')?.textContent;
+            if (notificationText === message) {
+                // Если такое уведомление уже есть, не создаем новое
+                return;
+            }
+        }
+        
+        // Создаем новое уведомление
+        const notification = document.createElement('div');
+        notification.className = `flash-message flash-${type === 'error' ? 'error' : type === 'info' ? 'info' : 'success'}`;
+        
+        if (type === 'info') {
+            notification.style.backgroundColor = '#cce5ff';
+            notification.style.color = '#004085';
+            notification.style.borderLeft = '4px solid #0d6efd';
+        }
+        
+        notification.innerHTML = `
+            <span>${message}</span>
+            <span class="close-flash">&times;</span>
+        `;
+        
+        // Добавляем в контейнер
+        container.appendChild(notification);
+        
+        // Обработчик закрытия уведомления
+        const closeBtn = notification.querySelector('.close-flash');
+        closeBtn.addEventListener('click', function() {
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                container.removeChild(notification);
+            }, 300);
+        });
+        
+        // Автоматическое закрытие через указанное время
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                if (container.contains(notification)) {
+                    container.removeChild(notification);
+                }
+            }, 300);
+        }, duration);
+    }
+    
+    // Закрытие модального окна при клике вне его
+    window.addEventListener('click', function(event) {
+        const modals = document.getElementsByClassName('modal');
+        for (let modal of modals) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -31,7 +31,10 @@
                         <div class="dropdown-menu">
                             <div class="dropdown-header">{{ current_user.username }}</div>
                             <a href="{{ url_for('profile') }}" class="dropdown-item">Профиль</a>
-                            <a href="#" class="dropdown-item">Мои обращения</a>
+                            {% if current_user.has_admin_rights() %}
+                            <a href="{{ url_for('admin_appeals') }}" class="dropdown-item">Обращения</a>
+                            <a href="{{ url_for('admin_users') }}" class="dropdown-item">Пользователи</a>
+                            {% endif %}
                             <a href="{{ url_for('logout') }}" class="dropdown-item">Выйти</a>
                         </div>
                         

@@ -26,15 +26,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Явно устанавливаем начальные стили для навигационного логотипа
         navLogo.style.opacity = '0';
         navLogo.style.visibility = 'hidden';
-        navLogo.style.transition = 'opacity 0.3s ease, visibility 0.3s ease';
+        navLogo.style.transition = 'none';
         
         // Добавляем логотип в начало навигационного меню
         navContainer.insertBefore(navLogo, navContainer.firstChild);
     }
     
-    // Добавляем плавный переход для верхнего логотипа
+    // Убираем анимацию для верхнего логотипа - будет резкий переход
     if (topLogo) {
-        topLogo.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        topLogo.style.transition = 'none';
     }
     
     // Переменная для отслеживания состояния заголовка (скрыт/показан)
@@ -58,80 +58,57 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateHeaderAnimation() {
         const scrollPosition = window.scrollY;
         const threshold = 50; // Порог начала анимации
-        const animationDistance = 100; // Увеличиваем расстояние для более плавной анимации
         
-        // Определяем прогресс анимации (от 0 до 1) с более плавной кривой ускорения
-        let progress = 0;
-        if (scrollPosition >= threshold) {
-            // Используем кубическую функцию для более плавного перехода
-            const linearProgress = Math.min(1, (scrollPosition - threshold) / animationDistance);
-            progress = easeInOutCubic(linearProgress);
-        }
+        // Вместо плавного прогресса используем резкое переключение
+        const showHeader = scrollPosition < threshold;
         
-        // Проверяем, изменился ли прогресс существенно (с точностью до 2 знаков)
-        // Это помогает избежать ненужных обновлений DOM
-        const roundedProgress = Math.round(progress * 100) / 100;
-        if (Math.abs(roundedProgress - lastProgress) < 0.01 && lastProgress !== -1) {
+        // Упрощенная логика: либо показываем хедер полностью, либо скрываем его
+        const progress = showHeader ? 0 : 1;
+        
+        // Проверяем, изменилось ли состояние заголовка
+        if (progress === lastProgress && lastProgress !== -1) {
             return;
         }
         
-        lastProgress = roundedProgress;
+        lastProgress = progress;
         
         // Применяем плавную анимацию скрытия верхней панели
         if (progress > 0) {
-            const opacity = 1 - progress;
-            const translateY = -progress * initialTopHeaderHeight;
-            
-            // Синхронизированное изменение стилей для плавного перехода
+            // Полностью резкое изменение стилей без плавного перехода
             header.classList.add('transitioning');
             
-            // Для верхней панели - прозрачность и сдвиг
-            topHeader.style.opacity = opacity;
-            topHeader.style.transform = `translateY(${-progress * 10}px)`;
+            // Резко скрываем или показываем верхнюю панель
+            topHeader.style.opacity = progress === 1 ? '0' : '1';
+            topHeader.style.transform = progress === 1 ? 'translateY(-100%)' : 'translateY(0)';
             
-            // Для навигационного меню - перемещение вверх относительно прогресса
-            mainNav.style.transform = `translateY(${translateY}px)`;
+            // Навигационное меню сразу перемещается вверх на полную высоту хедера
+            mainNav.style.transform = progress === 1 ? `translateY(${-initialTopHeaderHeight}px)` : 'translateY(0)';
             
-            // Плавно управляем видимостью навигационного логотипа
-            // Добавляем небольшую задержку для навигационного логотипа, чтобы избежать наложения
-            if (progress > 0.05) {
+            // Бинарное управление видимостью навигационного логотипа
+            // Сразу показываем/скрываем без промежуточных состояний
+            if (progress === 1) {
+                // Показываем логотип в меню
                 navLogo.style.visibility = 'visible';
-                
-                // Делаем навигационный логотип видимым только когда верхний логотип начинает скрываться
-                // Используем кубическую функцию для более плавного появления
-                navLogo.style.opacity = easeInOutCubic(Math.max(0, (progress - 0.1) / 0.9));
-                
-                // Делаем логотип кликабельным, когда он достаточно видимый
-                if (progress > 0.3) {
-                    navLogo.style.pointerEvents = 'auto';
-                    // Добавляем класс visible для гарантии кликабельности
-                    navLogo.classList.add('visible');
-                } else {
-                    navLogo.style.pointerEvents = 'none';
-                    navLogo.classList.remove('visible');
-                }
+                navLogo.style.opacity = '1';
+                navLogo.style.pointerEvents = 'auto';
+                navLogo.classList.add('visible');
             } else {
+                // Скрываем логотип
                 navLogo.style.opacity = '0';
+                navLogo.style.visibility = 'hidden';
                 navLogo.style.pointerEvents = 'none';
                 navLogo.classList.remove('visible');
-                
-                // Используем setTimeout для задержки скрытия, чтобы завершить анимацию прозрачности
-                setTimeout(() => {
-                    if (lastProgress <= 0.05) {
-                        navLogo.style.visibility = 'hidden';
-                    }
-                }, 300);
             }
             
-            // Полное скрытие верхней панели при почти завершенной анимации
-            if (progress >= 0.95 && !isHeaderCollapsed) {
+            // резкое переключение классов для фиксированного режима
+            if (progress === 1 && !isHeaderCollapsed) {
                 document.body.classList.add('header-hidden');
                 mainNav.classList.add('nav-fixed');
                 // Гарантируем, что логотип кликабельный в фиксированном режиме
                 navLogo.classList.add('visible');
                 navLogo.style.pointerEvents = 'auto';
                 isHeaderCollapsed = true;
-            } else if (progress < 0.95 && isHeaderCollapsed) {
+            } else if (progress === 0 && isHeaderCollapsed) {
                 document.body.classList.remove('header-hidden');
                 mainNav.classList.remove('nav-fixed');
                 isHeaderCollapsed = false;
@@ -143,15 +120,11 @@ document.addEventListener('DOMContentLoaded', function() {
             topHeader.style.transform = 'translateY(0)';
             mainNav.style.transform = 'translateY(0)';
             
-            // Сначала скрываем с анимацией, затем убираем видимость
+            // Сразу скрываем без анимации
             navLogo.style.opacity = '0';
             navLogo.style.pointerEvents = 'none';
             navLogo.classList.remove('visible');
-            setTimeout(() => {
-                if (lastProgress <= 0) {
-                    navLogo.style.visibility = 'hidden';
-                }
-            }, 300);
+            navLogo.style.visibility = 'hidden';
             
             document.body.classList.remove('header-hidden');
             mainNav.classList.remove('nav-fixed');

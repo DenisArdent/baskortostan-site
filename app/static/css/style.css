@@ -37,17 +37,15 @@ header {
     z-index: 1000; /* Высокий z-index чтобы меню было поверх контента */
 }
 
-/* Улучшенные анимации при переходе */
+/* Резкие переходы вместо анимаций */
 header.transitioning {
-    /* Используем will-change для предупреждения браузера о будущих анимациях */
-    will-change: transform, opacity;
+    /* Убираем will-change, так как больше нет анимаций */
+    will-change: auto;
 }
 
-/* Плавные переходы для элементов хедера с разными настройками для повышения плавности */
+/* Убираем все переходы */
 header.transitioning * {
-    transition-property: transform, opacity, visibility;
-    transition-duration: 0.35s;
-    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transition: none;
 }
 
 /* Общий контейнер для содержимого */
@@ -74,11 +72,9 @@ header.transitioning * {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     width: 100%;
     box-sizing: border-box;
-    will-change: opacity, transform;
     overflow: hidden;
-    transform-origin: center top; /* Задаем точку трансформации для более плавного эффекта */
-    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-    /* Используем z-index для четкого разделения */
+    transform-origin: center top;
+    transition: none; /* Убираем все анимации для резкого перехода */
     z-index: 15;
     position: relative;
 }
@@ -87,9 +83,9 @@ header.transitioning * {
     font-size: 1.5rem;
     font-weight: bold;
     letter-spacing: 0.5px;
-    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-    will-change: opacity, transform;
-    /* Делаем backface-visibility: hidden для улучшения рендеринга */
+    transition: none; /* Убираем анимацию */
+    /* Убираем will-change */
+    /* Сохраняем backface-visibility */
     backface-visibility: hidden;
 }
 

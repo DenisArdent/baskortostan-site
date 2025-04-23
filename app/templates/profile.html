@@ -9,8 +9,29 @@
                 <div class="content-section">
                     <h2>Личные данные</h2>
                     <div class="user-info">
-                        <p><strong>Email:</strong> {{ current_user.email }}</p>
-                        <p><strong>На сайте с:</strong> {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
+                        <div class="user-info-item">
+                            <div class="info-label">Email:</div>
+                            <div class="info-value">{{ current_user.email }}</div>
+                        </div>
+                        <div class="user-info-item">
+                            <div class="info-label">На сайте с:</div>
+                            <div class="info-value">{{ current_user.created_at.strftime('%d.%m.%Y') }}</div>
+                        </div>
+                        {% if current_user.has_admin_rights() %}
+                            {% set admin_role = current_user.get_admin_role() %}
+                            <div class="user-info-item">
+                                <div class="info-label">Статус:</div>
+                                <div class="info-value">
+                                    {% if admin_role == 'admin' %}
+                                        <span class="role-badge admin">Администратор</span>
+                                    {% elif admin_role == 'editor' %}
+                                        <span class="role-badge editor">Редактор</span>
+                                    {% else %}
+                                        <span class="role-badge user">Пользователь</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                     <form method="POST" action="{{ url_for('profile') }}">
                         {{ form.hidden_tag() }}
@@ -68,6 +89,72 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .user-info {
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 12px;
+    }
+    
+    .user-info-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .user-info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        width: 35%;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.95rem;
+    }
+    
+    .info-value {
+        width: 65%;
+        color: #334155;
+        font-size: 0.95rem;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .role-badge.admin {
+        background-color: rgba(254, 202, 202, 0.4);
+        color: #be123c;
+        border: 1px solid rgba(254, 202, 202, 0.8);
+    }
+    
+    .role-badge.editor {
+        background-color: rgba(191, 219, 254, 0.4);
+        color: #0369a1;
+        border: 1px solid rgba(191, 219, 254, 0.8);
+    }
+    
+    .role-badge.user {
+        background-color: rgba(226, 232, 240, 0.5);
+        color: #475569;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}
